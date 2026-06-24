@@ -43,8 +43,9 @@ export default function ResetPasswordPage() {
     try {
 
       await axios.post(
-        `https://jo-tech-b7lk.onrender.com/api/auth/reset-password/${token}`,
+        `https://jo-tech-b7lk.onrender.com/api/auth/reset-password`,
         {
+          token,
           password
         }
       );
