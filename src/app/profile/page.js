@@ -141,7 +141,7 @@ export default function ProfilePage() {
               </p>
 
               <h3 className="text-3xl font-bold text-orange-500 mt-2">
-                {analytics?.totalXp || 0}
+                {analytics?.totalXP || analytics?.total_xp || analytics?.totalXp || 0}
               </h3>
             </Card>
 
