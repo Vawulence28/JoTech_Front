@@ -6,6 +6,7 @@ import Link from "next/link";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
+  const [user, setUser] = useState(null);
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -30,7 +31,10 @@ export default function ProfilePage() {
         }
       );
 
+      console.log(res.data);
+
       setProfile(res.data.profile);
+      setUser(res.data.user);
       setAnalytics(res.data.analytics || {});
     } catch (error) {
       console.error("Profile Error:", error);
@@ -109,7 +113,7 @@ export default function ProfilePage() {
               </p>
 
               <p className="font-semibold mt-1">
-                {profile.telegram_linked
+                {user?.telegram_linked
                   ? "✅ Connected"
                   : "⚠️ Not Connected"}
               </p>
@@ -308,7 +312,7 @@ export default function ProfilePage() {
                 </p>
 
                 <p className="text-blue-600 mt-1">
-                  {profile.telegram_linked
+                  {user?.telegram_linked
                     ? "Connected and receiving reminders"
                     : "Not connected"}
                 </p>
@@ -317,12 +321,12 @@ export default function ProfilePage() {
 
               <span
                 className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                  profile.telegram_linked
+                  user?.telegram_linked
                     ? "bg-green-100 text-green-700"
                     : "bg-orange-100 text-orange-700"
                 }`}
               >
-                {profile.telegram_linked
+                {user?.telegram_linked
                   ? "Connected"
                   : "Not Connected"}
               </span>
