@@ -340,7 +340,7 @@ export default function DashboardPage() {
                   </p>
 
                   <h3 className="text-3xl font-bold text-blue-900 mt-2">
-                    {analytics?.totalXp || 0}
+                    {analytics?.totalXP || analytics?.total_xp || analytics?.totalXp || 0}
                   </h3>
                 </Card>
 
