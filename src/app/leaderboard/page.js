@@ -26,11 +26,11 @@ export default function LeaderboardPage() {
           const [boardRes, rankRes] =
             await Promise.all([
               axios.get(
-                "http://localhost:5000/api/leaderboard"
+                "http://jo-tech-b7lk.onrender.com/api/leaderboard"
               ),
 
               axios.get(
-                "http://localhost:5000/api/leaderboard/my-rank",
+                "http://jo-tech-b7lk.onrender.com/api/leaderboard/my-rank",
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,

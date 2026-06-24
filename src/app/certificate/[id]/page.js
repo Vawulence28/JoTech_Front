@@ -19,7 +19,7 @@ export default function CertificatePage() {
     const fetchCertificate = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/certificates/id/${id}`
+          `http://jo-tech-b7lk.onrender.com/api/certificates/id/${id}`
         );
 
         setCertificate(res.data.data);
@@ -230,7 +230,7 @@ export default function CertificatePage() {
           {certificate.certificate_url && (
 
             <a
-              href={`http://localhost:5000${certificate.certificate_url}`}
+              href={`http://jo-tech-b7lk.onrender.com${certificate.certificate_url}`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-blue-900 hover:bg-blue-800 text-white px-8 py-3 rounded-xl font-semibold transition"

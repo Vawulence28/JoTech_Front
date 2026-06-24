@@ -9,7 +9,7 @@ export default function CertificatePage({ params }) {
   useEffect(() => {
     axios
       .get(
-        `http://localhost:5000/api/certificates/${params.token}`
+        `http://jo-tech-b7lk.onrender.com/api/certificates/${params.token}`
       )
       .then((res) => setCert(res.data.data))
       .catch((err) =>
@@ -129,7 +129,7 @@ export default function CertificatePage({ params }) {
         <div className="flex flex-wrap justify-center gap-4 mt-10">
 
           <a
-            href={`http://localhost:5000${cert.certificate_url}`}
+            href={`http://jo-tech-b7lk.onrender.com${cert.certificate_url}`}
             target="_blank"
             rel="noopener noreferrer"
             className="bg-blue-900 hover:bg-blue-800 text-white px-8 py-3 rounded-xl font-semibold transition"

@@ -43,7 +43,7 @@ export default function ResetPasswordPage() {
     try {
 
       await axios.post(
-        `http://localhost:5000/api/auth/reset-password/${token}`,
+        `http://jo-tech-b7lk.onrender.com/api/auth/reset-password/${token}`,
         {
           password
         }

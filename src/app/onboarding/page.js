@@ -42,7 +42,7 @@ export default function OnboardingPage() {
       setLoading(true);
 
       const res = await fetch(
-        "http://localhost:5000/api/learning/generate",
+        "http://jo-tech-b7lk.onrender.com/api/learning/generate",
         {
           method: "POST",
           headers: {

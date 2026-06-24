@@ -21,7 +21,7 @@ export default function LessonPage() {
   const fetchLesson = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/learning/today",
+        "http://jo-tech-b7lk.onrender.com/api/learning/today",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -46,7 +46,7 @@ export default function LessonPage() {
       setCompleting(true);
 
       await axios.post(
-        "http://localhost:5000/api/learning/complete-today",
+        "http://jo-tech-b7lk.onrender.com/api/learning/complete-today",
         {},
         {
           headers: {

@@ -22,7 +22,7 @@ export default function ProfilePage() {
   const fetchProfile = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/profile/me",
+        "http://jo-tech-b7lk.onrender.com/api/profile/me",
         {
           headers: {
             Authorization: `Bearer ${token}`,

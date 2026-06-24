@@ -1,5 +1,5 @@
 export async function getAnalytics() {
-  const res = await fetch("http://localhost:5000/api/analytics/overview", {
+  const res = await fetch("http://jo-tech-b7lk.onrender.com/api/analytics/overview", {
     method: "GET",
     credentials: "include",
     headers: {

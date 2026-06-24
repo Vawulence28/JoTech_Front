@@ -22,7 +22,7 @@ export default function RecoveryPage() {
   const fetchRecovery = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/recovery/current",
+        "http://jo-tech-b7lk.onrender.com/api/recovery/current",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -46,7 +46,7 @@ export default function RecoveryPage() {
       setCreating(true);
 
       const res = await axios.post(
-        "http://localhost:5000/api/recovery/generate",
+        "http://jo-tech-b7lk.onrender.com/api/recovery/generate",
         {},
         {
           headers: {
@@ -74,7 +74,7 @@ export default function RecoveryPage() {
       setRecovering(true);
 
       const res = await axios.post(
-        "http://localhost:5000/api/recovery/recover-today",
+        "http://jo-tech-b7lk.onrender.com/api/recovery/recover-today",
         {},
         {
           headers: {
