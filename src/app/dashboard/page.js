@@ -340,7 +340,7 @@ export default function DashboardPage() {
                   </p>
 
                   <h3 className="text-3xl font-bold text-blue-900 mt-2">
-                    {analytics?.total_xp || 0}
+                    {analytics?.totalXp || 0}
                   </h3>
                 </Card>
 
@@ -351,7 +351,7 @@ export default function DashboardPage() {
 
                   <h3 className="text-3xl font-bold text-orange-500 mt-2">
                     🔥{" "}
-                    {analytics?.current_streak || 0}
+                    {analytics?.currentStreak || 0}
                   </h3>
                 </Card>
 
@@ -361,7 +361,7 @@ export default function DashboardPage() {
                   </p>
 
                   <h3 className="text-3xl font-bold text-blue-900 mt-2">
-                    {analytics?.completed_tasks || 0}
+                    {analytics?.completedTasks || 0}
                   </h3>
                 </Card>
 

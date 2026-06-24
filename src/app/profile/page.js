@@ -137,7 +137,7 @@ export default function ProfilePage() {
               </p>
 
               <h3 className="text-3xl font-bold text-orange-500 mt-2">
-                {analytics?.total_xp || 0}
+                {analytics?.totalXp || 0}
               </h3>
             </Card>
 
@@ -147,7 +147,7 @@ export default function ProfilePage() {
               </p>
 
               <h3 className="text-3xl font-bold text-orange-500 mt-2">
-                🔥 {analytics?.current_streak || 0}
+                🔥 {analytics?.currentStreak || 0}
               </h3>
             </Card>
 
