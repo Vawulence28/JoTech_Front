@@ -23,7 +23,7 @@ export default function RoadmapPage() {
     const loadRoadmap = async () => {
       try {
         const res = await axios.get(
-          "http://jo-tech-b7lk.onrender.com/api/learning/roadmap",
+          "https://jo-tech-b7lk.onrender.com/api/learning/roadmap",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -51,7 +51,7 @@ export default function RoadmapPage() {
       setCompleting(true);
 
       const res = await axios.post(
-        "http://jo-tech-b7lk.onrender.com/api/learning/complete-roadmap",
+        "https://jo-tech-b7lk.onrender.com/api/learning/complete-roadmap",
         {},
         {
           headers: {

@@ -16,7 +16,7 @@ export default function ForgotPasswordPage() {
 
     try {
       await axios.post(
-        "http://jo-tech-b7lk.onrender.com/api/auth/forgot-password",
+        "https://jo-tech-b7lk.onrender.com/api/auth/forgot-password",
         {
           email,
         }

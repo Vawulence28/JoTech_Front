@@ -3,7 +3,7 @@ import axios from "axios";
 const api = axios.create({
   baseURL:
     process.env.NEXT_PUBLIC_API_URL ||
-    "http://jo-tech-b7lk.onrender.com/api",
+    "https://jo-tech-b7lk.onrender.com/api",
 });
 
 api.interceptors.request.use(

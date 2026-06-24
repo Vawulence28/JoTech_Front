@@ -65,7 +65,7 @@ export default function DashboardPage() {
   const fetchAnalytics = async () => {
     try {
       const res = await axios.get(
-        "http://jo-tech-b7lk.onrender.com/api/analytics/overview",
+        "https://jo-tech-b7lk.onrender.com/api/analytics/overview",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -94,7 +94,7 @@ export default function DashboardPage() {
       setLessonLoading(true);
 
       const res = await axios.get(
-        "http://jo-tech-b7lk.onrender.com/api/learning/roadmap",
+        "https://jo-tech-b7lk.onrender.com/api/learning/roadmap",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -164,7 +164,7 @@ export default function DashboardPage() {
   const fetchRecoveryPlan = async () => {
     try {
       const res = await axios.get(
-        "http://jo-tech-b7lk.onrender.com/api/recovery/current",
+        "https://jo-tech-b7lk.onrender.com/api/recovery/current",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -187,7 +187,7 @@ export default function DashboardPage() {
       setCreatingRecovery(true);
 
       const res = await axios.post(
-        "http://jo-tech-b7lk.onrender.com/api/recovery/generate",
+        "https://jo-tech-b7lk.onrender.com/api/recovery/generate",
         {},
         {
           headers: {
@@ -215,7 +215,7 @@ export default function DashboardPage() {
       setLoadingTelegram(true);
 
       const res = await axios.get(
-        "http://jo-tech-b7lk.onrender.com/api/telegram/generate-link",
+        "https://jo-tech-b7lk.onrender.com/api/telegram/generate-link",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -245,7 +245,7 @@ export default function DashboardPage() {
       setCompletingLesson(true);
 
       await axios.post(
-        "http://jo-tech-b7lk.onrender.com/api/learning/complete-today",
+        "https://jo-tech-b7lk.onrender.com/api/learning/complete-today",
         {},
         {
           headers: {
