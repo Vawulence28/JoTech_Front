@@ -3,6 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 
 import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 
 import PWARegister from "@/components/pwa/PWARegister";
 import InstallPrompt from "@/components/pwa/InstallPrompt";
@@ -17,26 +18,26 @@ export const metadata = {
   },
 
   description:
-    "JO-Tech Learn is an AI-powered personalized learning platform that generates structured learning roadmaps, tracks progress, rewards consistency with badges and certificates, and helps learners achieve their career goals.",
+    "JO-Tech Learn is an AI-powered personalized learning platform that generates structured learning roadmaps, tracks learning progress, rewards consistency with badges and certificates, and helps learners achieve their career goals.",
 
   applicationName: "JO-Tech Learn",
 
   keywords: [
+    "JO-Tech Learn",
     "AI Learning",
-    "Learning Roadmap",
     "Personalized Learning",
+    "Learning Roadmap",
+    "Learning Platform",
     "Skill Development",
     "Career Growth",
     "Education",
     "Online Learning",
-    "Learning Platform",
     "Learning Tracker",
     "Learning Streak",
     "Certificates",
     "Badges",
     "Productivity",
     "AI Education",
-    "JO-Tech Learn",
   ],
 
   authors: [
@@ -55,12 +56,13 @@ export const metadata = {
   robots: {
     index: true,
     follow: true,
+
     googleBot: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
       "max-image-preview": "large",
       "max-snippet": -1,
+      "max-video-preview": -1,
     },
   },
 
@@ -70,21 +72,26 @@ export const metadata = {
 
   openGraph: {
     type: "website",
+
     locale: "en_US",
+
     url: "https://jo-tech-hub.vercel.app",
+
+    siteName: "JO-Tech Learn",
 
     title: "JO-Tech Learn",
 
     description:
-      "Generate personalized learning roadmaps, stay consistent with daily lessons, recover missed sessions, earn certificates, badges, and track your learning progress.",
-
-    siteName: "JO-Tech Learn",
+      "Generate personalized AI learning roadmaps, stay consistent with daily lessons, recover missed sessions, earn certificates and badges, and track your learning journey.",
 
     images: [
       {
         url: "/og-image.png",
+
         width: 1200,
+
         height: 630,
+
         alt: "JO-Tech Learn",
       },
     ],
@@ -96,9 +103,11 @@ export const metadata = {
     title: "JO-Tech Learn",
 
     description:
-      "A personalized learning platform with smart roadmaps, streak tracking, certificates, badges and progress analytics.",
+      "AI-powered personalized learning platform with smart roadmaps, streak tracking, progress analytics and certificates.",
 
-    images: ["/og-image.png"],
+    images: [
+      "/og-image.png",
+    ],
   },
 
   icons: {
@@ -112,14 +121,14 @@ export const metadata = {
       },
     ],
 
-    shortcut: "/favicon.ico",
-
     apple: [
       {
         url: "/apple-touch-icon.png",
         sizes: "180x180",
       },
     ],
+
+    shortcut: "/favicon.ico",
   },
 
   manifest: "/site.webmanifest",
@@ -150,33 +159,52 @@ export const viewport = {
   themeColor: "#1E3A8A",
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({
+  children,
+}) {
   return (
     <html lang="en">
+
       <body className="bg-white text-black">
 
         <AuthProvider>
 
           {/* Register Service Worker */}
+
           <PWARegister />
 
-          {/* Offline Notification */}
+          {/* Offline Banner */}
+
           <OfflineBanner />
 
           {/* Install App Prompt */}
+
           <InstallPrompt />
 
-          {/* Global Navigation */}
-          <Navbar />
+          <div className="min-h-screen flex flex-col">
 
-          {/* Page Content */}
-          <main className="min-h-screen">
-            {children}
-          </main>
+            {/* Global Navigation */}
+
+            <Navbar />
+
+            {/* Main Content */}
+
+            <main className="flex-1">
+
+              {children}
+
+            </main>
+
+            {/* Global Footer */}
+
+            <Footer />
+
+          </div>
 
         </AuthProvider>
 
       </body>
+
     </html>
   );
 }

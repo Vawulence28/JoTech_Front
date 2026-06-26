@@ -4,53 +4,65 @@ import { useState } from "react";
 import axios from "axios";
 
 export default function ContactPage() {
-  const [form, setForm] = useState({
-    subject: "",
-    message: "",
-  });
-
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-
   const token =
     typeof window !== "undefined"
       ? localStorage.getItem("token")
       : null;
 
+  const isAuthenticated = !!token;
+
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
   const handleChange = (e) => {
-    setForm({
-      ...form,
+    setForm((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!token) {
-      alert("Please login to contact support.");
-      return;
-    }
-
     try {
       setLoading(true);
 
+      const payload = isAuthenticated
+        ? {
+            subject: form.subject,
+            message: form.message,
+          }
+        : {
+            name: form.name,
+            email: form.email,
+            subject: form.subject,
+            message: form.message,
+          };
+
       await axios.post(
         "https://jo-tech-b7lk.onrender.com/api/contact",
+        payload,
         {
-          subject: form.subject,
-          message: form.message,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: token
+            ? {
+                Authorization: `Bearer ${token}`,
+              }
+            : {},
         }
       );
 
       setSubmitted(true);
 
       setForm({
+        name: "",
+        email: "",
         subject: "",
         message: "",
       });
@@ -58,7 +70,7 @@ export default function ContactPage() {
       console.error(error);
 
       alert(
-        error?.response?.data?.message ||
+        error.response?.data?.message ||
           "Unable to send your message."
       );
     } finally {
@@ -68,35 +80,50 @@ export default function ContactPage() {
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <div className="max-w-6xl mx-auto px-6 py-16">
 
-        <h1 className="text-4xl font-bold text-blue-900">
-          Contact Us
-        </h1>
+      {/* HERO */}
 
-        <p className="mt-4 text-gray-600 max-w-2xl">
-          Have a question, feedback, feature request, or need support?
-          We'd love to hear from you.
-        </p>
+      <section className="bg-blue-900 text-white">
 
-        <div className="grid lg:grid-cols-3 gap-10 mt-14">
+        <div className="max-w-7xl mx-auto px-6 py-16">
 
-          {/* Contact Information */}
+          <h1 className="text-4xl md:text-5xl font-bold">
+            Contact Us
+          </h1>
 
-          <div className="space-y-8">
+          <p className="mt-5 text-blue-100 max-w-3xl text-lg">
+            We'd love to hear from you. Whether you have a question,
+            feedback, bug report, feature request, or simply want to say
+            hello, we're here to help.
+          </p>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-blue-100 p-6">
-              <h2 className="text-xl font-semibold text-blue-900">
+        </div>
+
+      </section>
+
+      <div className="max-w-7xl mx-auto px-6 py-14">
+
+        <div className="grid lg:grid-cols-3 gap-10">
+
+          {/* LEFT COLUMN */}
+
+          <div className="space-y-6">
+
+            <div className="bg-white rounded-2xl border border-blue-100 shadow-sm p-6">
+
+              <h2 className="text-xl font-bold text-blue-900">
                 Email
               </h2>
 
-              <p className="mt-3 text-gray-600">
+              <p className="mt-3 text-gray-600 break-all">
                 joelconsult01@gmail.com
               </p>
+
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-blue-100 p-6">
-              <h2 className="text-xl font-semibold text-blue-900">
+            <div className="bg-white rounded-2xl border border-blue-100 shadow-sm p-6">
+
+              <h2 className="text-xl font-bold text-blue-900">
                 Website
               </h2>
 
@@ -104,43 +131,61 @@ export default function ContactPage() {
                 href="https://jo-tech-hub.vercel.app"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-3 block text-orange-600"
+                className="block mt-3 text-orange-500 hover:underline break-all"
               >
                 https://jo-tech-hub.vercel.app
               </a>
+
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-blue-100 p-6">
-              <h2 className="text-xl font-semibold text-blue-900">
+            <div className="bg-white rounded-2xl border border-blue-100 shadow-sm p-6">
+
+              <h2 className="text-xl font-bold text-blue-900">
                 Support Hours
               </h2>
 
               <p className="mt-3 text-gray-600">
-                Monday – Friday
+                Monday - Friday
                 <br />
-                10:00 AM – 4:00 PM (WAT)
+                10:00 AM - 4:00 PM (WAT)
               </p>
+
+            </div>
+
+            <div className="bg-blue-900 text-white rounded-2xl p-6">
+
+              <h2 className="text-xl font-bold">
+                Need Help?
+              </h2>
+
+              <p className="mt-3 text-blue-100">
+                We usually respond within one business day.
+              </p>
+
             </div>
 
           </div>
 
-          {/* Contact Form */}
+          {/* RIGHT COLUMN */}
 
           <div className="lg:col-span-2">
 
-            <div className="bg-white rounded-2xl shadow-sm border border-blue-100 p-8">
+            <div className="bg-white rounded-2xl border border-blue-100 shadow-sm p-8">
 
               {submitted ? (
 
-                <div className="rounded-xl bg-green-100 border border-green-300 p-5">
-                  <h2 className="text-xl font-bold text-green-700">
+                <div className="bg-green-50 border border-green-200 rounded-xl p-6">
+
+                  <h2 className="text-2xl font-bold text-green-700">
                     Message Sent Successfully 🎉
                   </h2>
 
-                  <p className="mt-2 text-green-700">
-                    Thank you for contacting JoTech Learn.
-                    We've received your message and will respond as soon as possible.
+                  <p className="mt-3 text-green-700">
+                    Thank you for contacting JO-Tech Learn.
+                    We have received your message and will get back to you
+                    as soon as possible.
                   </p>
+
                 </div>
 
               ) : (
@@ -150,37 +195,80 @@ export default function ContactPage() {
                   className="space-y-6"
                 >
 
+                  {!isAuthenticated && (
+
+                    <>
+                      <div>
+
+                        <label className="block font-semibold text-blue-900">
+                          Full Name
+                        </label>
+
+                        <input
+                          type="text"
+                          name="name"
+                          required
+                          value={form.name}
+                          onChange={handleChange}
+                          placeholder="Enter your full name"
+                          className="w-full mt-2 rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-900"
+                        />
+
+                      </div>
+
+                      <div>
+
+                        <label className="block font-semibold text-blue-900">
+                          Email Address
+                        </label>
+
+                        <input
+                          type="email"
+                          name="email"
+                          required
+                          value={form.email}
+                          onChange={handleChange}
+                          placeholder="Enter your email"
+                          className="w-full mt-2 rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-900"
+                        />
+
+                      </div>
+                    </>
+
+                  )}
+
                   <div>
 
-                    <label className="font-medium">
+                    <label className="block font-semibold text-blue-900">
                       Subject
                     </label>
 
                     <input
+                      type="text"
                       name="subject"
+                      required
                       value={form.subject}
                       onChange={handleChange}
-                      required
                       placeholder="Briefly describe your issue"
-                      className="w-full mt-2 border rounded-xl px-4 py-3"
+                      className="w-full mt-2 rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-900"
                     />
 
                   </div>
 
                   <div>
 
-                    <label className="font-medium">
+                    <label className="block font-semibold text-blue-900">
                       Message
                     </label>
 
                     <textarea
-                      rows="7"
+                      rows={8}
                       name="message"
+                      required
                       value={form.message}
                       onChange={handleChange}
-                      required
                       placeholder="Tell us how we can help you..."
-                      className="w-full mt-2 border rounded-xl px-4 py-3"
+                      className="w-full mt-2 rounded-xl border border-gray-300 px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-900"
                     />
 
                   </div>
@@ -188,10 +276,10 @@ export default function ContactPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="bg-blue-900 text-white px-8 py-3 rounded-xl hover:bg-blue-800 transition disabled:opacity-50"
+                    className="bg-blue-900 hover:bg-blue-800 text-white px-8 py-3 rounded-xl font-semibold transition disabled:opacity-60"
                   >
                     {loading
-                      ? "Sending..."
+                      ? "Sending Message..."
                       : "Send Message"}
                   </button>
 
@@ -206,6 +294,7 @@ export default function ContactPage() {
         </div>
 
       </div>
+
     </main>
   );
 }
