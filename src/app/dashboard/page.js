@@ -6,20 +6,23 @@ import axios from "axios";
 import ProtectedRoute from "@/components/layout/ProtectedRoute";
 
 export default function DashboardPage() {
+  // ===================================
+  // STATES
+  // ===================================
+
   const [loadingTelegram, setLoadingTelegram] = useState(false);
 
   const [analytics, setAnalytics] = useState(null);
+
   const [todayLesson, setTodayLesson] = useState(null);
+
   const [recoveryPlan, setRecoveryPlan] = useState(null);
 
-  const [analyticsLoading, setAnalyticsLoading] =
-    useState(true);
+  const [analyticsLoading, setAnalyticsLoading] = useState(true);
 
-  const [lessonLoading, setLessonLoading] =
-    useState(true);
+  const [lessonLoading, setLessonLoading] = useState(true);
 
-  const [recoveryLoading, setRecoveryLoading] =
-    useState(true);
+  const [recoveryLoading, setRecoveryLoading] = useState(true);
 
   const [completingLesson, setCompletingLesson] =
     useState(false);
@@ -36,15 +39,8 @@ export default function DashboardPage() {
       : null;
 
   // ===================================
-  // HELPERS
+  // REUSABLE COMPONENTS
   // ===================================
-
-  const todayName = new Date().toLocaleDateString(
-    "en-US",
-    {
-      weekday: "long",
-    }
-  );
 
   const Card = ({ children }) => (
     <div className="bg-white border border-blue-100 rounded-2xl shadow-sm p-6">
@@ -86,7 +82,7 @@ export default function DashboardPage() {
   };
 
   // ===================================
-  // ACTIVE ROADMAP
+  // TODAY LESSON
   // ===================================
 
   const fetchTodayLesson = async () => {
@@ -94,7 +90,7 @@ export default function DashboardPage() {
       setLessonLoading(true);
 
       const res = await axios.get(
-        "https://jo-tech-b7lk.onrender.com/api/learning/roadmap",
+        "https://jo-tech-b7lk.onrender.com/api/learning/today",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -102,53 +98,12 @@ export default function DashboardPage() {
         }
       );
 
-      const roadmap =
-        res.data?.data?.roadmap_json;
-
-      if (!roadmap?.weeks?.length) {
+      if (!res.data?.success) {
         setTodayLesson(null);
         return;
       }
 
-      const allLessons = [];
-
-      roadmap.weeks.forEach((week) => {
-        week.days?.forEach((day) => {
-          allLessons.push({
-            weekNumber: week.week,
-            weekFocus: week.focus,
-            weekTopic: week.topic,
-            ...day,
-          });
-        });
-      });
-
-      if (!allLessons.length) {
-        setTodayLesson(null);
-        return;
-      }
-
-      let lesson = allLessons.find(
-        (item) =>
-          item.day?.toLowerCase() ===
-          todayName.toLowerCase()
-      );
-
-      if (!lesson) {
-        lesson = allLessons[0];
-      }
-
-      setTodayLesson({
-        goal: roadmap.goal,
-        weekNumber: lesson.weekNumber,
-        weekFocus: lesson.weekFocus,
-        weekTopic: lesson.weekTopic,
-        day: lesson.day,
-        topic: lesson.topic,
-        tasks: lesson.tasks || [],
-        learningLink:
-          lesson.learning_link || "",
-      });
+      setTodayLesson(res.data.data);
     } catch (error) {
       console.error(error);
       setTodayLesson(null);
@@ -181,6 +136,10 @@ export default function DashboardPage() {
       setRecoveryLoading(false);
     }
   };
+
+  // ===================================
+  // GENERATE RECOVERY
+  // ===================================
 
   const generateRecoveryPlan = async () => {
     try {
@@ -237,7 +196,7 @@ export default function DashboardPage() {
   };
 
   // ===================================
-  // COMPLETE LESSON
+  // COMPLETE TODAY LESSON
   // ===================================
 
   const completeLesson = async () => {
@@ -256,7 +215,10 @@ export default function DashboardPage() {
 
       setLessonCompleted(true);
 
-      fetchAnalytics();
+      await fetchAnalytics();
+
+      await fetchTodayLesson();
+
     } catch (error) {
       console.error(error);
     } finally {
@@ -265,22 +227,52 @@ export default function DashboardPage() {
   };
 
   // ===================================
-  // LOAD
+  // CHECK IF TODAY ALREADY COMPLETED
+  // ===================================
+
+  const fetchCompletionStatus =
+    async () => {
+      try {
+        const res =
+          await axios.get(
+            "https://jo-tech-b7lk.onrender.com/api/learning/completion-status",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+        setLessonCompleted(
+          res.data?.completed || false
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+  // ===================================
+  // INITIAL LOAD
   // ===================================
 
   useEffect(() => {
     if (!token) return;
 
     fetchAnalytics();
+
     fetchTodayLesson();
+
     fetchRecoveryPlan();
+
+    fetchCompletionStatus();
+
   }, [token]);
 
   // ===================================
   // UI
   // ===================================
 
-  return (
+    return (
     <ProtectedRoute>
       <div className="min-h-screen bg-slate-50">
 
@@ -294,7 +286,7 @@ export default function DashboardPage() {
               </h1>
 
               <p className="mt-2 text-blue-100">
-                To your learning journey
+                Continue your learning journey today.
               </p>
             </div>
 
@@ -302,14 +294,14 @@ export default function DashboardPage() {
 
               <Link
                 href="/onboarding"
-                className="bg-orange-500 px-5 py-3 rounded-xl font-semibold"
+                className="bg-orange-500 px-5 py-3 rounded-xl font-semibold hover:bg-orange-600 transition"
               >
                 New Roadmap
               </Link>
 
               <button
                 onClick={connectTelegram}
-                className="border border-white/30 px-5 py-3 rounded-xl"
+                className="border border-white/30 px-5 py-3 rounded-xl hover:bg-white/10 transition"
               >
                 {loadingTelegram
                   ? "Connecting..."
@@ -317,45 +309,61 @@ export default function DashboardPage() {
               </button>
 
             </div>
+
           </div>
         </div>
 
         <div className="max-w-7xl mx-auto px-6 py-10 space-y-10">
 
-          {/* ANALYTICS */}
+          {/* ==========================================
+              ANALYTICS
+          ========================================== */}
 
           <section>
+
             <SectionTitle>
               Analytics
             </SectionTitle>
 
             {analyticsLoading ? (
-              <Card>Loading analytics...</Card>
+
+              <Card>
+                Loading analytics...
+              </Card>
+
             ) : (
+
               <div className="grid md:grid-cols-3 gap-5">
 
                 <Card>
+
                   <p className="text-gray-500">
                     Total XP
                   </p>
 
                   <h3 className="text-3xl font-bold text-blue-900 mt-2">
-                    {analytics?.totalXP || analytics?.total_xp || analytics?.totalXp || 0}
+                    {analytics?.totalXP ||
+                      analytics?.total_xp ||
+                      analytics?.totalXp ||
+                      0}
                   </h3>
+
                 </Card>
 
                 <Card>
+
                   <p className="text-gray-500">
                     Current Streak
                   </p>
 
                   <h3 className="text-3xl font-bold text-orange-500 mt-2">
-                    🔥{" "}
-                    {analytics?.currentStreak || 0}
+                    🔥 {analytics?.currentStreak || 0}
                   </h3>
+
                 </Card>
 
                 <Card>
+
                   <p className="text-gray-500">
                     Completed Lessons
                   </p>
@@ -363,147 +371,219 @@ export default function DashboardPage() {
                   <h3 className="text-3xl font-bold text-blue-900 mt-2">
                     {analytics?.completedTasks || 0}
                   </h3>
+
                 </Card>
 
               </div>
+
             )}
+
           </section>
 
-          {/* TODAY LESSON */}
+          {/* ==========================================
+              TODAY LESSON
+          ========================================== */}
 
           <section>
+
             <SectionTitle>
               Today's Lesson
             </SectionTitle>
 
             {lessonLoading ? (
+
               <Card>
-                Loading lesson...
+                Loading today's lesson...
               </Card>
+
             ) : !todayLesson ? (
-              <Card>
-                No lesson available
-              </Card>
-            ) : (
+
               <Card>
 
-                <h3 className="text-2xl font-bold text-blue-900">
+                <p className="text-gray-500">
+                  No active roadmap found.
+                </p>
+
+              </Card>
+
+            ) : (
+
+              <Card>
+
+                <h3 className="text-3xl font-bold text-blue-900">
                   {todayLesson.goal}
                 </h3>
 
-                <p className="mt-2 text-orange-600">
-                  Week {todayLesson.weekNumber}
-                </p>
+                <div className="mt-3 flex flex-wrap gap-3">
 
-                <p className="mt-1 text-gray-600">
-                  {todayLesson.day}
-                </p>
+                  <span className="bg-blue-100 text-blue-900 px-3 py-1 rounded-full text-sm font-medium">
+                    Week {todayLesson.currentWeekNumber}
+                  </span>
+
+                  <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-medium">
+                    Day {todayLesson.lesson?.day_number}
+                  </span>
+
+                </div>
 
                 <div className="mt-6">
-                  <h4 className="font-bold text-blue-900">
+
+                  <h4 className="font-semibold text-blue-900">
                     Weekly Focus
                   </h4>
 
-                  <p className="mt-2">
-                    {todayLesson.weekFocus}
+                  <p className="mt-2 text-gray-700">
+                    {todayLesson.weeklyFocus}
                   </p>
+
                 </div>
 
                 <div className="mt-6">
-                  <h4 className="font-bold text-blue-900">
+
+                  <h4 className="font-semibold text-blue-900">
+                    Weekly Topic
+                  </h4>
+
+                  <p className="mt-2 text-gray-700">
+                    {todayLesson.weeklyTopic}
+                  </p>
+
+                </div>
+
+                <div className="mt-6">
+
+                  <h4 className="font-semibold text-blue-900">
                     Today's Topic
                   </h4>
 
-                  <p className="mt-2">
-                    {todayLesson.topic}
+                  <p className="mt-2 text-lg font-medium">
+                    {todayLesson.lesson?.topic}
                   </p>
+
                 </div>
 
                 <div className="mt-6">
-                  <h4 className="font-bold text-blue-900">
+
+                  <h4 className="font-semibold text-blue-900">
                     Tasks
                   </h4>
 
                   <ul className="list-disc ml-6 mt-3 space-y-2">
-                    {todayLesson.tasks.map(
+
+                    {(todayLesson.lesson?.tasks || []).map(
                       (task, index) => (
                         <li key={index}>
                           {task}
                         </li>
                       )
                     )}
+
                   </ul>
+
                 </div>
 
-                {todayLesson.learningLink && (
+                {todayLesson.lesson?.learning_link && (
+
                   <a
-                    href={
-                      todayLesson.learningLink
-                    }
+                    href={todayLesson.lesson.learning_link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block mt-6 text-orange-600 font-semibold"
+                    className="inline-flex mt-8 text-orange-600 font-semibold hover:text-orange-700"
                   >
-                    ▶ Learning Resource
+                    ▶ Open Learning Resource
                   </a>
+
                 )}
 
-                <button
-                  onClick={completeLesson}
-                  disabled={
-                    completingLesson ||
-                    lessonCompleted
-                  }
-                  className="mt-8 bg-blue-900 text-white px-6 py-3 rounded-xl"
-                >
-                  {lessonCompleted
-                    ? "Completed ✓"
-                    : completingLesson
-                    ? "Completing..."
-                    : "Mark as Completed"}
-                </button>
+                <div className="mt-8">
+
+                  <button
+                    onClick={completeLesson}
+                    disabled={
+                      completingLesson ||
+                      lessonCompleted
+                    }
+                    className="bg-blue-900 text-white px-6 py-3 rounded-xl hover:bg-blue-800 transition disabled:opacity-60"
+                  >
+                    {lessonCompleted
+                      ? "Completed ✓"
+                      : completingLesson
+                      ? "Completing..."
+                      : "Mark as Completed"}
+                  </button>
+
+                </div>
 
               </Card>
+
             )}
+
           </section>
 
-          {/* RECOVERY */}
+          {/* ==========================================
+              RECOVERY PLAN
+          ========================================== */}
 
           <section>
+
             <SectionTitle>
               Recovery Plan
             </SectionTitle>
 
             {recoveryLoading ? (
+
               <Card>
-                Checking recovery...
+                Checking recovery status...
               </Card>
+
             ) : recoveryPlan ? (
+
               <Card>
-                <p className="font-semibold text-orange-600">
+
+                <h3 className="text-xl font-bold text-orange-600">
                   Recovery Plan Available
+                </h3>
+
+                <p className="mt-3 text-gray-700">
+                  You currently have an active recovery plan.
+                  Continue learning to regain your momentum.
                 </p>
+
+                <Link
+                  href="/recovery"
+                  className="inline-block mt-6 bg-orange-500 text-white px-5 py-3 rounded-xl hover:bg-orange-600 transition"
+                >
+                  View Recovery Plan
+                </Link>
+
               </Card>
+
             ) : (
+
               <Card>
+
+                <p className="text-gray-700 mb-5">
+                  No recovery plan is currently active.
+                </p>
+
                 <button
-                  onClick={
-                    generateRecoveryPlan
-                  }
-                  disabled={
-                    creatingRecovery
-                  }
-                  className="bg-orange-500 text-white px-6 py-3 rounded-xl"
+                  onClick={generateRecoveryPlan}
+                  disabled={creatingRecovery}
+                  className="bg-orange-500 text-white px-6 py-3 rounded-xl hover:bg-orange-600 transition disabled:opacity-60"
                 >
                   {creatingRecovery
                     ? "Generating..."
                     : "Generate Recovery Plan"}
                 </button>
+
               </Card>
+
             )}
+
           </section>
 
         </div>
+
       </div>
     </ProtectedRoute>
   );

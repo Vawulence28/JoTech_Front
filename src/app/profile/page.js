@@ -9,6 +9,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
   const token =
     typeof window !== "undefined"
@@ -80,6 +81,41 @@ export default function ProfilePage() {
       </div>
     );
   }
+
+  const deleteAccount = async () => {
+    const confirmed = window.confirm(
+      "This will permanently delete your account and ALL learning data.\n\nThis action cannot be undone.\n\nDo you want to continue?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setDeleting(true);
+
+      await axios.delete(
+        "https://jo-tech-b7lk.onrender.com/api/auth/delete-account",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      window.location.href = "/";
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        error.response?.data?.message ||
+          "Unable to delete account."
+      );
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white text-blue-950">
@@ -341,6 +377,43 @@ export default function ProfilePage() {
             </Link>
 
           </Card>
+
+        </div>
+
+        {/* DELETE ACCOUNT */}
+
+        <div>
+
+          <SectionTitle>Danger Zone</SectionTitle>
+
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-8">
+
+            <h3 className="text-2xl font-bold text-red-700">
+              Delete Account
+            </h3>
+
+            <p className="mt-4 text-red-600 max-w-3xl">
+              Deleting your account will permanently remove your profile,
+              learning roadmaps, progress, streaks, XP, badges,
+              certificates, reminders, recovery plans and every other piece
+              of data associated with your JoTech account.
+            </p>
+
+            <p className="mt-3 font-semibold text-red-700">
+              This action is immediate and cannot be undone.
+            </p>
+
+            <button
+              onClick={deleteAccount}
+              disabled={deleting}
+              className="mt-8 bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-xl font-semibold"
+            >
+              {deleting
+                ? "Deleting Account..."
+                : "Delete My Account"}
+            </button>
+
+          </div>
 
         </div>
 
