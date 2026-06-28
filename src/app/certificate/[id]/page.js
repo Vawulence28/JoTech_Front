@@ -157,19 +157,19 @@ export default function CertificatePage() {
 
         {/* CERTIFICATE */}
 
-        <div className="flex justify-center">
+        <div className="w-full overflow-x-auto py-8">
 
-          <div className="relative w-full max-w-7xl aspect-[1.414/1] overflow-hidden rounded-2xl bg-[#fcfaf5] shadow-2xl border-8 border-blue-900">
+          <div className="mx-auto w-[1188px] h-[840px] relative overflow-hidden rounded-2xl bg-[#fcfaf5] shadow-2xl border-[10px] border-blue-900">
 
             {/* INNER BORDER */}
 
-            <div className="absolute inset-4 border-4 border-orange-400 rounded-xl"></div>
+            <div className="absolute inset-4 border-[4px] border-orange-400 rounded-xl"></div>
 
             {/* WATERMARK */}
 
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
 
-              <span className="text-[18rem] md:text-[24rem] font-black text-blue-100 opacity-10 select-none">
+              <span className="text-[260px] font-black text-blue-100 opacity-10 select-none">
                 JO
               </span>
 
@@ -177,21 +177,21 @@ export default function CertificatePage() {
 
             {/* CORNERS */}
 
-            <div className="absolute top-6 left-6 w-14 h-14 border-l-4 border-t-4 border-orange-400"></div>
+            <div className="absolute top-6 left-6 w-16 h-16 border-l-4 border-t-4 border-orange-400"></div>
 
-            <div className="absolute top-6 right-6 w-14 h-14 border-r-4 border-t-4 border-orange-400"></div>
+            <div className="absolute top-6 right-6 w-16 h-16 border-r-4 border-t-4 border-orange-400"></div>
 
-            <div className="absolute bottom-6 left-6 w-14 h-14 border-l-4 border-b-4 border-orange-400"></div>
+            <div className="absolute bottom-6 left-6 w-16 h-16 border-l-4 border-b-4 border-orange-400"></div>
 
-            <div className="absolute bottom-6 right-6 w-14 h-14 border-r-4 border-b-4 border-orange-400"></div>
+            <div className="absolute bottom-6 right-6 w-16 h-16 border-r-4 border-b-4 border-orange-400"></div>
 
-            <div className="relative h-full flex flex-col justify-between px-16 py-12">
+            <div className="relative flex flex-col justify-between h-full px-20 py-16">
 
               {/* HEADER */}
 
               <div className="text-center">
 
-                <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-orange-100 border-4 border-orange-400 shadow">
+                <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-orange-100 border-4 border-orange-400 shadow-lg">
 
                   <span className="text-5xl">
                     🏆
@@ -199,11 +199,11 @@ export default function CertificatePage() {
 
                 </div>
 
-                <p className="mt-4 uppercase tracking-[0.5em] text-blue-700 font-semibold">
+                <p className="mt-5 uppercase tracking-[0.6em] text-blue-700 font-semibold">
                   JO-TECH
                 </p>
 
-                <h1 className="text-6xl font-extrabold text-blue-900 mt-3">
+                <h1 className="mt-3 text-6xl font-black tracking-wide text-blue-900">
                   CERTIFICATE
                 </h1>
 
@@ -217,21 +217,21 @@ export default function CertificatePage() {
 
               <div className="text-center">
 
-                <p className="text-xl text-gray-700">
+                <p className="text-2xl text-gray-700">
                   This certificate is proudly awarded to
                 </p>
 
-                <h2 className="mt-6 text-6xl font-bold text-blue-900">
+                <h2 className="mt-8 text-6xl font-bold text-blue-900">
                   {certificate.user_name}
                 </h2>
 
-                <div className="w-40 h-1 bg-orange-500 rounded-full mx-auto my-8"></div>
+                <div className="w-52 h-1 bg-orange-500 rounded-full mx-auto my-8"></div>
 
-                <p className="text-xl text-gray-700">
+                <p className="text-2xl text-gray-700">
                   for successfully completing the course on
                 </p>
 
-                <h3 className="mt-5 text-4xl font-bold text-orange-600">
+                <h3 className="mt-6 text-4xl font-bold text-orange-600">
                   {certificate.course_name}
                 </h3>
 
@@ -239,17 +239,17 @@ export default function CertificatePage() {
 
               {/* FOOTER */}
 
-              <div className="grid grid-cols-3 items-end">
+              <div className="grid grid-cols-3 gap-8 items-end">
 
                 {/* LEFT */}
 
-                <div className="text-left">
+                <div>
 
-                  <p className="text-gray-500">
+                  <p className="text-gray-500 text-lg">
                     Issued on
                   </p>
 
-                  <p className="mt-2 text-lg font-semibold text-blue-900">
+                  <p className="mt-2 text-2xl font-semibold text-blue-900">
                     {new Date(
                       certificate.issued_at
                     ).toDateString()}
@@ -261,15 +261,15 @@ export default function CertificatePage() {
 
                 <div className="flex flex-col items-center">
 
-                  <div className="w-20 h-20 rounded-full bg-orange-500 flex items-center justify-center text-white text-4xl shadow-lg">
+                  <div className="w-24 h-24 rounded-full bg-orange-500 flex items-center justify-center text-white text-5xl shadow-lg">
 
                     ✓
 
                   </div>
 
-                  <div className="border-t-2 border-gray-400 w-60 mt-6 pt-2 text-center">
+                  <div className="border-t-2 border-gray-400 w-72 mt-6 pt-3 text-center">
 
-                    <p className="font-semibold text-blue-900">
+                    <p className="text-lg font-semibold text-blue-900">
                       JO-Tech Certification Authority
                     </p>
 
@@ -281,19 +281,19 @@ export default function CertificatePage() {
 
                 <div className="text-right">
 
-                  <p className="text-gray-500">
-                    Certificate No.
+                  <p className="text-gray-500 text-lg">
+                    Certificate Number
                   </p>
 
-                  <p className="mt-2 text-lg font-semibold text-blue-900">
+                  <p className="mt-2 text-xl font-bold text-blue-900">
                     {certificate.certificate_number}
                   </p>
 
-                  <p className="mt-4 text-gray-500">
+                  <p className="mt-6 text-gray-500 text-lg">
                     Verification Code
                   </p>
 
-                  <p className="font-semibold text-orange-600 tracking-widest">
+                  <p className="mt-2 text-xl font-bold tracking-[0.25em] text-orange-600">
                     {certificate.verification_code}
                   </p>
 
