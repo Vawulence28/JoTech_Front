@@ -5,73 +5,225 @@ import { useParams } from "next/navigation";
 import axios from "axios";
 
 export default function CertificatePage() {
+
   const { id } = useParams();
 
-  const [certificate, setCertificate] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [certificate, setCertificate] =
+    useState(null);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
 
   // =====================================
   // FETCH CERTIFICATE
   // =====================================
 
   useEffect(() => {
-    const fetchCertificate = async () => {
-      try {
-        const res = await axios.get(
-          `https://jo-tech-b7lk.onrender.com/api/certificates/id/${id}`
-        );
 
-        setCertificate(res.data.data);
+    const fetchCertificate =
+      async () => {
 
-      } catch (err) {
+        try {
 
-        console.error(
-          "Certificate Error:",
-          err
-        );
+          const response =
+            await axios.get(
+              `https://jo-tech-b7lk.onrender.com/api/certificates/id/${id}`
+            );
 
-        setError(
-          "Failed to load certificate"
-        );
+          setCertificate(
+            response.data.data
+          );
 
-      } finally {
+        } catch (err) {
 
-        setLoading(false);
+          console.error(
+            "Certificate Fetch Error:",
+            err
+          );
 
-      }
-    };
+          setError(
+            "Failed to load certificate."
+          );
+
+        } finally {
+
+          setLoading(false);
+
+        }
+
+      };
 
     if (id) {
       fetchCertificate();
     }
+
   }, [id]);
 
   // =====================================
-  // LOADING
+  // DOWNLOAD CERTIFICATE
+  // =====================================
+
+  const handleDownload =
+    async () => {
+
+      try {
+
+        const token =
+          localStorage.getItem("token");
+
+        const response =
+          await axios.get(
+            `https://jo-tech-b7lk.onrender.com/api/certificates/download/${certificate.id}`,
+            {
+              responseType: "blob",
+              headers: {
+                Authorization:
+                  `Bearer ${token}`
+              }
+            }
+          );
+
+        const blob =
+          new Blob(
+            [response.data],
+            {
+              type:
+                "application/pdf"
+            }
+          );
+
+        const downloadUrl =
+          window.URL.createObjectURL(
+            blob
+          );
+
+        const link =
+          document.createElement("a");
+
+        link.href =
+          downloadUrl;
+
+        link.download =
+          `${certificate.user_name.replace(/\s+/g, "_")}_Certificate.pdf`;
+
+        document.body.appendChild(
+          link
+        );
+
+        link.click();
+
+        link.remove();
+
+        window.URL.revokeObjectURL(
+          downloadUrl
+        );
+
+      } catch (err) {
+
+        console.error(
+          "Download Error:",
+          err
+        );
+
+        alert(
+          "Unable to download certificate."
+        );
+
+      }
+
+    };
+
+  // =====================================
+  // SHARE CERTIFICATE
+  // =====================================
+
+  const handleShare =
+    async () => {
+
+      const shareUrl =
+        `${window.location.origin}/certificate/share/${certificate.share_token}`;
+
+      try {
+
+        if (navigator.share) {
+
+          await navigator.share({
+
+            title:
+              "My Jo-Tech Certificate",
+
+            text:
+              "View my certificate of completion.",
+
+            url:
+              shareUrl
+
+          });
+
+        } else {
+
+          await navigator.clipboard.writeText(
+            shareUrl
+          );
+
+          alert(
+            "Certificate link copied to clipboard."
+          );
+
+        }
+
+      } catch (err) {
+
+        console.error(
+          "Share Error:",
+          err
+        );
+
+      }
+
+    };
+
+  // =====================================
+  // LOADING STATE
   // =====================================
 
   if (loading) {
+
     return (
+
       <div className="min-h-screen flex items-center justify-center bg-white">
+
         <p className="text-lg font-medium text-blue-900">
           Loading Certificate...
         </p>
+
       </div>
+
     );
+
   }
 
   // =====================================
-  // ERROR
+  // ERROR STATE
   // =====================================
 
   if (error || !certificate) {
+
     return (
+
       <div className="min-h-screen flex items-center justify-center bg-white px-6">
-        <div className="text-center max-w-lg">
+
+        <div className="max-w-lg text-center">
 
           <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-6">
-            <span className="text-3xl">⚠️</span>
+
+            <span className="text-3xl">
+              ⚠️
+            </span>
+
           </div>
 
           <h1 className="text-4xl font-bold text-blue-900">
@@ -80,59 +232,23 @@ export default function CertificatePage() {
 
           <p className="mt-4 text-gray-600">
             {error ||
-              "The requested certificate does not exist."}
+              "The requested certificate could not be found."}
           </p>
 
         </div>
+
       </div>
+
     );
+
   }
-
-  // =====================================
-  // SHARE CERTIFICATE
-  // =====================================
-
-  const handleShare = async () => {
-    const shareUrl =
-      `${window.location.origin}/certificate/share/${certificate.share_token}`;
-
-    try {
-
-      if (navigator.share) {
-
-        await navigator.share({
-          title: "My LearnFlow Certificate",
-          text: "View my certificate",
-          url: shareUrl
-        });
-
-      } else {
-
-        await navigator.clipboard.writeText(
-          shareUrl
-        );
-
-        alert(
-          "Certificate link copied to clipboard."
-        );
-
-      }
-
-    } catch (error) {
-
-      console.error(
-        "Share Error:",
-        error
-      );
-
-    }
-  };
 
   // =====================================
   // PAGE
   // =====================================
 
   return (
+
     <div className="min-h-screen bg-gray-50 px-6 py-12">
 
       <div className="max-w-6xl mx-auto">
@@ -175,7 +291,7 @@ export default function CertificatePage() {
 
             </div>
 
-            {/* CORNERS */}
+            {/* CORNER DECORATIONS */}
 
             <div className="absolute top-6 left-6 w-16 h-16 border-l-4 border-t-4 border-orange-400"></div>
 
@@ -207,7 +323,7 @@ export default function CertificatePage() {
                   CERTIFICATE
                 </h1>
 
-                <p className="text-2xl text-orange-600 font-semibold">
+                <p className="text-2xl font-semibold text-orange-600">
                   OF COMPLETION
                 </p>
 
@@ -225,7 +341,7 @@ export default function CertificatePage() {
                   {certificate.user_name}
                 </h2>
 
-                <div className="w-52 h-1 bg-orange-500 rounded-full mx-auto my-8"></div>
+                <div className="w-52 h-1 rounded-full bg-orange-500 mx-auto my-8"></div>
 
                 <p className="text-2xl text-gray-700">
                   for successfully completing the course on
@@ -241,11 +357,11 @@ export default function CertificatePage() {
 
               <div className="grid grid-cols-3 gap-8 items-end">
 
-                {/* LEFT */}
+                {/* ISSUE DATE */}
 
                 <div>
 
-                  <p className="text-gray-500 text-lg">
+                  <p className="text-lg text-gray-500">
                     Issued on
                   </p>
 
@@ -257,17 +373,17 @@ export default function CertificatePage() {
 
                 </div>
 
-                {/* CENTER */}
+                {/* CERTIFICATION */}
 
                 <div className="flex flex-col items-center">
 
-                  <div className="w-24 h-24 rounded-full bg-orange-500 flex items-center justify-center text-white text-5xl shadow-lg">
+                  <div className="w-24 h-24 rounded-full bg-orange-500 flex items-center justify-center shadow-lg text-white text-5xl">
 
                     ✓
 
                   </div>
 
-                  <div className="border-t-2 border-gray-400 w-72 mt-6 pt-3 text-center">
+                  <div className="w-72 mt-6 pt-3 border-t-2 border-gray-400 text-center">
 
                     <p className="text-lg font-semibold text-blue-900">
                       JO-Tech Certification Authority
@@ -277,11 +393,11 @@ export default function CertificatePage() {
 
                 </div>
 
-                {/* RIGHT */}
+                {/* CERTIFICATE DETAILS */}
 
                 <div className="text-right">
 
-                  <p className="text-gray-500 text-lg">
+                  <p className="text-lg text-gray-500">
                     Certificate Number
                   </p>
 
@@ -289,7 +405,7 @@ export default function CertificatePage() {
                     {certificate.certificate_number}
                   </p>
 
-                  <p className="mt-6 text-gray-500 text-lg">
+                  <p className="mt-6 text-lg text-gray-500">
                     Verification Code
                   </p>
 
@@ -307,33 +423,31 @@ export default function CertificatePage() {
 
         </div>
 
-        {/* ACTION BUTTONS */}
+        {/* =====================================
+            ACTION BUTTONS
+        ====================================== */}
 
         <div className="flex flex-wrap justify-center gap-4 mt-10">
 
-          {certificate.certificate_url && (
-
-            <a
-              href={`https://jo-tech-b7lk.onrender.com${certificate.certificate_url}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-blue-900 hover:bg-blue-800 text-white px-8 py-3 rounded-xl font-semibold transition"
-            >
-              Download PDF
-            </a>
-
-          )}
+          <button
+            onClick={handleDownload}
+            className="bg-blue-900 hover:bg-blue-800 text-white px-8 py-3 rounded-xl font-semibold transition duration-200"
+          >
+            Download PDF
+          </button>
 
           <button
             onClick={handleShare}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-xl font-semibold transition"
+            className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-xl font-semibold transition duration-200"
           >
             Share Certificate
           </button>
 
         </div>
 
-        {/* VERIFICATION CARD */}
+        {/* =====================================
+            VERIFICATION CARD
+        ====================================== */}
 
         <div className="bg-white border border-blue-100 rounded-3xl shadow-sm p-8 mt-12">
 
@@ -347,7 +461,10 @@ export default function CertificatePage() {
 
           <div className="grid md:grid-cols-3 gap-6 mt-8">
 
-            <div className="bg-blue-50 p-5 rounded-xl">
+            {/* CERTIFICATE ID */}
+
+            <div className="bg-blue-50 rounded-xl p-5">
+
               <p className="text-sm text-blue-600 mb-2">
                 Certificate ID
               </p>
@@ -355,9 +472,13 @@ export default function CertificatePage() {
               <p className="font-semibold text-blue-900 break-all">
                 {certificate.id}
               </p>
+
             </div>
 
-            <div className="bg-orange-50 p-5 rounded-xl">
+            {/* SHARE TOKEN */}
+
+            <div className="bg-orange-50 rounded-xl p-5">
+
               <p className="text-sm text-orange-600 mb-2">
                 Verification Token
               </p>
@@ -365,9 +486,13 @@ export default function CertificatePage() {
               <p className="font-semibold text-orange-700 break-all">
                 {certificate.share_token}
               </p>
+
             </div>
 
-            <div className="bg-blue-50 p-5 rounded-xl">
+            {/* ISSUE DATE */}
+
+            <div className="bg-blue-50 rounded-xl p-5">
+
               <p className="text-sm text-blue-600 mb-2">
                 Issue Date
               </p>
@@ -377,6 +502,7 @@ export default function CertificatePage() {
                   certificate.issued_at
                 ).toDateString()}
               </p>
+
             </div>
 
           </div>
@@ -386,5 +512,7 @@ export default function CertificatePage() {
       </div>
 
     </div>
+
   );
+
 }
