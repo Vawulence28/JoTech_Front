@@ -58,22 +58,19 @@ export function AuthProvider({
     initializeAuth();
   }, []);
 
-  const login = (
-    token,
-    user
-  ) => {
-    localStorage.setItem(
-      "token",
-      token
-    );
+  const login = (token, user) => {
+    localStorage.setItem("token", token);
+
+    if (user.role === "admin") {
+      localStorage.setItem("admin_token", token);
+    }
 
     setUser(user);
   };
 
   const logout = () => {
-    localStorage.removeItem(
-      "token"
-    );
+    localStorage.removeItem("token");
+    localStorage.removeItem("admin_token");
 
     setUser(null);
   };
