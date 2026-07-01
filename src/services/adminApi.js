@@ -3,17 +3,6 @@ import axios from "axios";
 // ==========================================
 // ADMIN API CLIENT
 // ==========================================
-//
-// Central API client for the Admin Panel.
-//
-// Responsibilities
-// ----------------
-// • Configure Axios
-// • Attach JWT automatically
-// • Handle expired sessions
-// • Expose helper functions
-//
-// ==========================================
 
 const API = axios.create({
   baseURL:
@@ -43,7 +32,6 @@ API.interceptors.request.use(
 
     return config;
   },
-
   (error) => Promise.reject(error)
 );
 
@@ -53,7 +41,6 @@ API.interceptors.request.use(
 
 API.interceptors.response.use(
   (response) => response,
-
   (error) => {
     if (
       typeof window !== "undefined" &&
@@ -62,7 +49,6 @@ API.interceptors.response.use(
       localStorage.removeItem("admin_token");
       localStorage.removeItem("admin_user");
 
-      // Prevent redirect loop while already on login page
       if (
         !window.location.pathname.startsWith("/admin/login")
       ) {
@@ -82,6 +68,9 @@ export async function getDashboardMetrics() {
   const { data } = await API.get("/admin/dashboard");
   return data;
 }
+
+// Legacy alias
+export const getDashboard = getDashboardMetrics;
 
 export async function getRecentUsers(limit = 10) {
   const { data } = await API.get(
@@ -108,7 +97,7 @@ export async function getDashboardDropOffUsers() {
 }
 
 // ==========================================
-// USER MANAGEMENT
+// USERS
 // ==========================================
 
 export async function getUsers(
@@ -124,7 +113,9 @@ export async function getUsers(
 
 export async function searchUsers(query) {
   const { data } = await API.get(
-    `/admin/users/search?q=${encodeURIComponent(query)}`
+    `/admin/users/search?q=${encodeURIComponent(
+      query
+    )}`
   );
 
   return data;
@@ -234,8 +225,84 @@ export async function getStreakLeaderboard() {
   return data;
 }
 
+export async function getSettings() {
+  const { data } = await API.get(
+    "/admin/settings"
+  );
+
+  return data;
+}
+
+export async function updateSettings(payload) {
+  const { data } = await API.put(
+    "/admin/settings",
+    payload
+  );
+
+  return data;
+}
+
+export async function getCertificates(){
+  const {data}=await API.get(
+    "/admin/certificates"
+  );
+
+  return data;
+}
+
+export async function revokeCertificate(id){
+  const {data}=await API.patch(
+    `/admin/certificates/${id}/revoke`
+  );
+
+  return data;
+}
+
 // ==========================================
-// RAW API INSTANCE
+// DEFAULT EXPORT
+// ==========================================
+//
+// Supports:
+//
+// import adminApi from "...";
+//
+// adminApi.getUsers();
+// adminApi.getDashboard();
+// adminApi.getAnalytics();
+//
+// while still exposing the Axios instance.
+//
 // ==========================================
 
-export default API;
+const adminApi = {
+  api: API,
+
+  getDashboard,
+  getDashboardMetrics,
+
+  getRecentUsers,
+  getDashboardTelegramStats,
+  getDashboardDropOffUsers,
+
+  getUsers,
+  searchUsers,
+  suspendUser,
+  activateUser,
+  deleteUser,
+
+  getAnalytics,
+  getGrowthAnalytics,
+  getLearningAnalytics,
+  getDropOffAnalytics,
+  getTelegramAnalytics,
+  getCourseAnalytics,
+
+  getLeaderboard,
+  getXPLeaderboard,
+  getStreakLeaderboard,
+
+  getSettings,
+  updateSettings,
+};
+
+export default adminApi;
