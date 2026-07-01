@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import MetricCard from "@/components/admin/MetricCard";
 import LoadingCard from "@/components/admin/LoadingCard";
@@ -12,125 +12,136 @@ import {
 } from "@/services/adminApi";
 
 export default function AdminDashboard() {
-  const [dashboard, setDashboard] = useState(null);
-  const [analytics, setAnalytics] = useState(null);
+  const [dashboard, setDashboard] = useState({});
+  const [analytics, setAnalytics] = useState({});
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadDashboard();
-  }, []);
+  const loadDashboard = useCallback(async () => {
+    setLoading(true);
 
-  async function loadDashboard() {
     try {
-      setLoading(true);
-
       const [
-        dashboardResponse,
-        analyticsResponse,
-        leaderboardResponse,
+        dashboardResult,
+        analyticsResult,
+        leaderboardResult,
       ] = await Promise.all([
         getDashboardMetrics(),
         getAnalytics(),
         getLeaderboard(),
       ]);
 
-      setDashboard(dashboardResponse.data);
-      setAnalytics(analyticsResponse.data);
+      setDashboard(dashboardResult?.data || {});
+      setAnalytics(analyticsResult?.data || {});
 
       setLeaderboard(
-        leaderboardResponse.data?.streakLeaderboard || []
+        leaderboardResult?.data?.streakLeaderboard ||
+          leaderboardResult?.data ||
+          []
       );
     } catch (error) {
       console.error(
-        "Admin Dashboard Error:",
+        "Failed to load admin dashboard:",
         error
       );
+
+      setDashboard({});
+      setAnalytics({});
+      setLeaderboard([]);
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    loadDashboard();
+  }, [loadDashboard]);
+
+  const metrics = [
+    {
+      title: "Total Users",
+      value: dashboard.totalUsers,
+      icon: "👥",
+    },
+    {
+      title: "Active Learners",
+      value: dashboard.activeLearners,
+      icon: "🎓",
+    },
+    {
+      title: "Completed Roadmaps",
+      value: dashboard.completedRoadmaps,
+      icon: "🗺️",
+    },
+    {
+      title: "Active Roadmaps",
+      value: dashboard.activeRoadmaps,
+      icon: "📚",
+    },
+    {
+      title: "Lessons Completed",
+      value: dashboard.totalLessons,
+      icon: "✅",
+    },
+    {
+      title: "Certificates",
+      value: dashboard.certificates,
+      icon: "🏆",
+    },
+    {
+      title: "XP Earned",
+      value: dashboard.totalXP,
+      icon: "⭐",
+    },
+    {
+      title: "Badges Awarded",
+      value: dashboard.badges,
+      icon: "🥇",
+    },
+  ];
 
   return (
-    <>
-      <div className="mb-8">
+    <div className="space-y-8">
+      {/* Page Header */}
+
+      <section>
         <h1 className="text-3xl font-bold text-slate-900">
           Admin Dashboard
         </h1>
 
         <p className="mt-2 text-slate-500">
           Monitor learners, engagement,
-          analytics and platform health.
+          platform performance and overall
+          analytics.
         </p>
-      </div>
+      </section>
 
       {/* Metrics */}
 
-      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        {loading ? (
-          <>
-            {Array.from({ length: 8 }).map((_, index) => (
-              <LoadingCard key={index} />
+      <section className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+        {loading
+          ? Array.from({ length: 8 }).map(
+              (_, index) => (
+                <LoadingCard key={index} />
+              )
+            )
+          : metrics.map((metric) => (
+              <MetricCard
+                key={metric.title}
+                title={metric.title}
+                value={metric.value ?? 0}
+                icon={metric.icon}
+              />
             ))}
-          </>
-        ) : (
-          <>
-            <MetricCard
-              title="Total Users"
-              value={dashboard?.totalUsers ?? 0}
-              icon="👥"
-            />
-
-            <MetricCard
-              title="Active Learners"
-              value={dashboard?.activeLearners ?? 0}
-              icon="🎓"
-            />
-
-            <MetricCard
-              title="Completed Roadmaps"
-              value={dashboard?.completedRoadmaps ?? 0}
-              icon="🗺️"
-            />
-
-            <MetricCard
-              title="Active Roadmaps"
-              value={dashboard?.activeRoadmaps ?? 0}
-              icon="📚"
-            />
-
-            <MetricCard
-              title="Lessons Completed"
-              value={dashboard?.totalLessons ?? 0}
-              icon="✅"
-            />
-
-            <MetricCard
-              title="Certificates"
-              value={dashboard?.certificates ?? 0}
-              icon="🏆"
-            />
-
-            <MetricCard
-              title="XP Earned"
-              value={dashboard?.totalXP ?? 0}
-              icon="⭐"
-            />
-
-            <MetricCard
-              title="Badges Awarded"
-              value={dashboard?.badges ?? 0}
-              icon="🥇"
-            />
-          </>
-        )}
-      </div>
+      </section>
 
       {/* Analytics */}
 
-      <div className="grid gap-6 mt-8 lg:grid-cols-2">
-        <div className="bg-white rounded-xl shadow p-6">
-          <h2 className="text-xl font-semibold mb-5">
+      <section className="grid gap-6 lg:grid-cols-2">
+        {/* User Growth */}
+
+        <div className="rounded-xl bg-white p-6 shadow">
+          <h2 className="mb-6 text-xl font-semibold">
             User Growth
           </h2>
 
@@ -140,37 +151,55 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               <div className="flex justify-between">
                 <span>Today</span>
+
                 <strong>
-                  {analytics?.growth?.newUsersToday ?? 0}
+                  {analytics?.growth
+                    ?.newUsersToday ??
+                    analytics?.userGrowth
+                      ?.newToday ??
+                    0}
                 </strong>
               </div>
 
               <div className="flex justify-between">
                 <span>This Week</span>
+
                 <strong>
-                  {analytics?.growth?.newUsersWeek ?? 0}
+                  {analytics?.growth
+                    ?.newUsersWeek ??
+                    analytics?.userGrowth
+                      ?.newThisWeek ??
+                    0}
                 </strong>
               </div>
 
               <div className="flex justify-between">
                 <span>This Month</span>
+
                 <strong>
-                  {analytics?.growth?.newUsersMonth ?? 0}
+                  {analytics?.growth
+                    ?.newUsersMonth ??
+                    analytics?.userGrowth
+                      ?.newThisMonth ??
+                    0}
                 </strong>
               </div>
 
-              <div className="flex justify-between border-t pt-4">
+              <div className="flex justify-between border-t pt-4 font-semibold">
                 <span>Total Users</span>
-                <strong>
-                  {dashboard?.totalUsers ?? 0}
-                </strong>
+
+                <span>
+                  {dashboard.totalUsers ?? 0}
+                </span>
               </div>
             </div>
           )}
         </div>
 
-        <div className="bg-white rounded-xl shadow p-6">
-          <h2 className="text-xl font-semibold mb-5">
+        {/* Telegram */}
+
+        <div className="rounded-xl bg-white p-6 shadow">
+          <h2 className="mb-6 text-xl font-semibold">
             Telegram Statistics
           </h2>
 
@@ -180,57 +209,93 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               <div className="flex justify-between">
                 <span>Linked Users</span>
+
                 <strong>
-                  {analytics?.telegram?.telegramLinked ?? 0}
+                  {analytics?.telegram
+                    ?.telegramLinked ??
+                    analytics?.telegram
+                      ?.linkedUsers ??
+                    0}
+                </strong>
+              </div>
+
+              <div className="flex justify-between">
+                <span>Unlinked Users</span>
+
+                <strong>
+                  {analytics?.telegram
+                    ?.unlinkedUsers ??
+                    (
+                      analytics?.telegram
+                        ?.totalUsers ?? 0
+                    ) -
+                      (
+                        analytics?.telegram
+                          ?.telegramLinked ??
+                        analytics
+                          ?.telegram
+                          ?.linkedUsers ??
+                        0
+                      )}
                 </strong>
               </div>
 
               <div className="flex justify-between">
                 <span>Total Users</span>
+
                 <strong>
-                  {analytics?.telegram?.totalUsers ?? 0}
+                  {analytics?.telegram
+                    ?.totalUsers ??
+                    dashboard.totalUsers ??
+                    0}
                 </strong>
               </div>
 
               <div className="flex justify-between">
-                <span>Linked %</span>
+                <span>Linked Percentage</span>
+
                 <strong>
-                  {analytics?.telegram?.percentage ?? 0}%
+                  {analytics?.telegram
+                    ?.percentage ?? 0}
+                  %
                 </strong>
               </div>
             </div>
           )}
         </div>
-      </div>
+      </section>
 
       {/* Leaderboard */}
 
-      <div className="bg-white rounded-xl shadow mt-8 p-6">
-        <h2 className="text-xl font-semibold mb-6">
+      <section className="rounded-xl bg-white p-6 shadow">
+        <h2 className="mb-6 text-xl font-semibold">
           Streak Leaderboard
         </h2>
 
         {loading ? (
           <LoadingCard />
         ) : leaderboard.length === 0 ? (
-          <p className="text-slate-500">
+          <div className="py-8 text-center text-slate-500">
             No leaderboard data available.
-          </p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3">
+                <tr className="border-b text-left">
+                  <th className="py-3">
                     Rank
                   </th>
-                  <th className="text-left py-3">
+
+                  <th className="py-3">
                     Learner
                   </th>
-                  <th className="text-left py-3">
+
+                  <th className="py-3">
                     Current Streak
                   </th>
-                  <th className="text-left py-3">
+
+                  <th className="py-3">
                     Completed Lessons
                   </th>
                 </tr>
@@ -241,29 +306,35 @@ export default function AdminDashboard() {
                   (item, index) => (
                     <tr
                       key={
-                        item.learn_users?.id ??
+                        item.user_id ||
+                        item.learn_users
+                          ?.id ||
                         index
                       }
-                      className="border-b hover:bg-slate-50"
+                      className="border-b transition hover:bg-slate-50"
                     >
                       <td className="py-3">
                         #{index + 1}
                       </td>
 
                       <td className="py-3">
-                        {item.learn_users
-                          ?.full_name ??
+                        {item.full_name ||
+                          item.learn_users
+                            ?.full_name ||
                           "Unknown User"}
                       </td>
 
                       <td className="py-3">
-                        🔥 {item.current_streak}
+                        🔥{" "}
+                        {item.current_streak ??
+                          0}
                       </td>
 
                       <td className="py-3">
-                        {
-                          item.total_completed_lessons
-                        }
+                        {item.total_completed_lessons ??
+                          item.completed_lessons ??
+                          item.totalLessons ??
+                          0}
                       </td>
                     </tr>
                   )
@@ -272,7 +343,7 @@ export default function AdminDashboard() {
             </table>
           </div>
         )}
-      </div>
-    </>
+      </section>
+    </div>
   );
 }
