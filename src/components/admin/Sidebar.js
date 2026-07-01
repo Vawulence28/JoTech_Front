@@ -8,194 +8,226 @@ import { usePathname, useRouter } from "next/navigation";
 // ==========================================
 
 const menu = [
-
   {
     name: "Dashboard",
     icon: "🏠",
-    href: "/admin"
+    href: "/admin",
   },
-
   {
     name: "Users",
     icon: "👥",
-    href: "/admin/users"
+    href: "/admin/users",
   },
-
   {
     name: "Analytics",
     icon: "📈",
-    href: "/admin/analytics"
+    href: "/admin/analytics",
   },
-
   {
     name: "Leaderboards",
     icon: "🏆",
-    href: "/admin/leaderboard"
+    href: "/admin/leaderboard",
   },
-
   {
     name: "Telegram",
     icon: "🤖",
-    href: "/admin/telegram"
+    href: "/admin/telegram",
   },
-
   {
     name: "Certificates",
     icon: "🎓",
-    href: "/admin/certificates"
+    href: "/admin/certificates",
   },
-
   {
     name: "Settings",
     icon: "⚙️",
-    href: "/admin/settings"
-  }
-
+    href: "/admin/settings",
+  },
 ];
 
 // ==========================================
 // COMPONENT
 // ==========================================
 
-export default function Sidebar() {
+export default function Sidebar({
+  open = false,
+  onClose = () => {},
+}) {
+  const pathname = usePathname();
 
-  const pathname =
-    usePathname();
-
-  const router =
-    useRouter();
+  const router = useRouter();
 
   // ==========================================
   // LOGOUT
   // ==========================================
 
   function logout() {
+    localStorage.removeItem("admin_token");
+    localStorage.removeItem("admin_user");
 
-    localStorage.removeItem(
-      "admin_token"
-    );
-
-    localStorage.removeItem(
-      "admin_user"
-    );
-
-    router.replace(
-      "/admin/login"
-    );
-
+    router.replace("/admin/login");
   }
 
+  // ==========================================
+  // ACTIVE MENU
+  // ==========================================
+
+  function isActive(href) {
+    if (href === "/admin") {
+      return (
+        pathname === "/admin" ||
+        pathname === "/admin/dashboard"
+      );
+    }
+
+    return pathname.startsWith(href);
+  }
+
+  // ==========================================
+  // RENDER
+  // ==========================================
+
   return (
+    <>
+      {/* Mobile Overlay */}
 
-    <aside className="fixed left-0 top-0 h-screen w-72 bg-white border-r border-gray-200 shadow-sm flex flex-col z-50">
+      <div
+        onClick={onClose}
+        className={`
+          fixed inset-0 bg-black/40 z-40
+          transition-opacity duration-300
+          lg:hidden
+          ${
+            open
+              ? "opacity-100 visible"
+              : "opacity-0 invisible"
+          }
+        `}
+      />
 
-      {/* ======================================
-          HEADER
-      ====================================== */}
+      {/* Sidebar */}
 
-      <div className="px-8 py-8 border-b">
+      <aside
+        className={`
+          fixed top-0 left-0 z-50
+          h-screen w-72
+          bg-white border-r border-gray-200
+          shadow-xl
+          flex flex-col
 
-        <div className="flex items-center gap-4">
+          transform transition-transform duration-300
 
-          <div className="w-14 h-14 rounded-2xl bg-blue-900 text-white flex items-center justify-center text-2xl">
+          ${
+            open
+              ? "translate-x-0"
+              : "-translate-x-full"
+          }
 
-            🎓
+          lg:translate-x-0
+        `}
+      >
+        {/* Header */}
 
-          </div>
+        <div className="border-b px-6 py-6">
 
-          <div>
+          <div className="flex items-center justify-between">
 
-            <h2 className="font-black text-2xl text-blue-900">
+            <div className="flex items-center gap-4">
 
-              Jo-Tech
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-900 text-2xl text-white">
 
-            </h2>
+                🎓
 
-            <p className="text-sm text-gray-500">
+              </div>
 
-              Admin Panel
+              <div>
 
-            </p>
+                <h2 className="text-2xl font-black text-blue-900">
+
+                  Jo-Tech
+
+                </h2>
+
+                <p className="text-sm text-gray-500">
+
+                  Admin Panel
+
+                </p>
+
+              </div>
+
+            </div>
+
+            {/* Mobile Close */}
+
+            <button
+              onClick={onClose}
+              className="lg:hidden text-3xl text-gray-500 hover:text-red-500"
+            >
+              ×
+            </button>
 
           </div>
 
         </div>
 
-      </div>
+        {/* Navigation */}
 
-      {/* ======================================
-          NAVIGATION
-      ====================================== */}
+        <nav className="flex-1 overflow-y-auto px-4 py-6">
 
-      <nav className="flex-1 px-5 py-8 space-y-2">
+          <div className="space-y-2">
 
-        {
+            {menu.map((item) => {
+              const active = isActive(item.href);
 
-          menu.map((item) => {
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onClose}
+                  className={`
+                    flex items-center gap-4
+                    rounded-xl
+                    px-5
+                    py-4
+                    text-base
+                    font-semibold
+                    transition-all
 
-            const active =
-              pathname === item.href;
+                    ${
+                      active
+                        ? "bg-blue-900 text-white shadow-lg"
+                        : "text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                    }
+                  `}
+                >
+                  <span className="text-2xl">
+                    {item.icon}
+                  </span>
 
-            return (
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
 
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-4 rounded-xl px-5 py-4 transition-all font-semibold
+          </div>
 
-                ${
-                  active
+        </nav>
 
-                  ? "bg-blue-900 text-white shadow-lg"
+        {/* Footer */}
 
-                  : "text-gray-700 hover:bg-orange-50 hover:text-orange-600"
-                }`}
-              >
+        <div className="border-t p-6">
 
-                <span className="text-2xl">
+          <button
+            onClick={logout}
+            className="w-full rounded-xl bg-red-500 py-3 font-semibold text-white transition hover:bg-red-600"
+          >
+            🚪 Logout
+          </button>
 
-                  {item.icon}
+        </div>
 
-                </span>
-
-                <span>
-
-                  {item.name}
-
-                </span>
-
-              </Link>
-
-            );
-
-          })
-
-        }
-
-      </nav>
-
-      {/* ======================================
-          FOOTER
-      ====================================== */}
-
-      <div className="border-t p-6">
-
-        <button
-
-          onClick={logout}
-
-          className="w-full bg-red-500 hover:bg-red-600 text-white rounded-xl py-3 font-semibold transition"
-
-        >
-
-          🚪 Logout
-
-        </button>
-
-      </div>
-
-    </aside>
-
+      </aside>
+    </>
   );
-
 }

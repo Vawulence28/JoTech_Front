@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import AdminGuard from "@/components/admin/AdminGuard";
 import Sidebar from "@/components/admin/Sidebar";
@@ -12,11 +12,19 @@ export default function AdminLayout({
 }) {
   const router = useRouter();
 
+  const pathname = usePathname();
+
   const [loading, setLoading] =
     useState(true);
 
+  const [sidebarOpen, setSidebarOpen] =
+    useState(false);
+
+  const [admin, setAdmin] =
+    useState(null);
+
   // =====================================
-  // CHECK ADMIN TOKEN
+  // LOAD ADMIN SESSION
   // =====================================
 
   useEffect(() => {
@@ -35,8 +43,33 @@ export default function AdminLayout({
       return;
     }
 
+    const storedUser =
+      localStorage.getItem(
+        "admin_user"
+      );
+
+    if (storedUser) {
+      try {
+        setAdmin(
+          JSON.parse(storedUser)
+        );
+      } catch {
+        localStorage.removeItem(
+          "admin_user"
+        );
+      }
+    }
+
     setLoading(false);
   }, [router]);
+
+  // =====================================
+  // CLOSE SIDEBAR WHEN PAGE CHANGES
+  // =====================================
+
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
 
   // =====================================
   // LOADING
@@ -44,22 +77,24 @@ export default function AdminLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-100">
+      <div className="flex min-h-screen items-center justify-center bg-slate-100">
+
         <div className="text-center">
 
-          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="mx-auto h-16 w-16 animate-spin rounded-full border-4 border-orange-500 border-t-transparent"></div>
 
-          <p className="mt-6 text-blue-900 font-semibold">
+          <p className="mt-6 font-semibold text-blue-900">
             Loading Admin Panel...
           </p>
 
         </div>
+
       </div>
     );
   }
 
   // =====================================
-  // ADMIN LAYOUT
+  // PAGE
   // =====================================
 
   return (
@@ -67,18 +102,26 @@ export default function AdminLayout({
 
       <div className="min-h-screen bg-slate-100">
 
-        {/* Sidebar */}
+        <Sidebar
+          open={sidebarOpen}
+          onClose={() =>
+            setSidebarOpen(false)
+          }
+        />
 
-        <Sidebar />
+        <div className="min-h-screen lg:ml-72">
 
-        {/* Main Content */}
+          <Header
+            admin={admin}
+            onMenuClick={() =>
+              setSidebarOpen(true)
+            }
+          />
 
-        <div className="lg:ml-72 min-h-screen">
+          <main className="p-4 md:p-6 lg:p-8">
 
-          <Header />
-
-          <main className="p-8">
             {children}
+
           </main>
 
         </div>

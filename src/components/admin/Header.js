@@ -9,12 +9,13 @@ import { usePathname } from "next/navigation";
 
 const pageTitles = {
   "/admin": "Dashboard",
+  "/admin/dashboard": "Dashboard",
   "/admin/users": "Users",
   "/admin/analytics": "Analytics",
   "/admin/leaderboard": "Leaderboards",
   "/admin/telegram": "Telegram",
   "/admin/certificates": "Certificates",
-  "/admin/settings": "Settings"
+  "/admin/settings": "Settings",
 };
 
 // ==========================================
@@ -22,117 +23,125 @@ const pageTitles = {
 // ==========================================
 
 export default function Header({
-
-  admin
-
+  admin,
+  onMenuClick,
 }) {
+  const pathname = usePathname();
 
-  const pathname =
-    usePathname();
-
-  const [currentTime,
-    setCurrentTime] =
-    useState(new Date());
-
-  useEffect(() => {
-
-    const timer =
-      setInterval(() => {
-
-        setCurrentTime(
-          new Date()
-        );
-
-      }, 1000);
-
-    return () =>
-      clearInterval(timer);
-
-  }, []);
-
-  const title =
-    useMemo(() => {
-
-      return (
-        pageTitles[pathname] ||
-        "Admin Panel"
-      );
-
-    }, [pathname]);
-
-  const initials =
-    useMemo(() => {
-
-      if (!admin?.full_name) {
-
-        return "A";
-
-      }
-
-      return admin.full_name
-
-        .split(" ")
-
-        .map(
-          word =>
-            word.charAt(0)
-        )
-
-        .join("")
-
-        .substring(0, 2)
-
-        .toUpperCase();
-
-    }, [admin]);
+  const [currentTime, setCurrentTime] = useState(
+    new Date()
+  );
 
   // ==========================================
-  // PAGE
+  // LIVE CLOCK
+  // ==========================================
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // ==========================================
+  // PAGE TITLE
+  // ==========================================
+
+  const title = useMemo(() => {
+    const exact = pageTitles[pathname];
+
+    if (exact) return exact;
+
+    if (pathname.startsWith("/admin/users"))
+      return "Users";
+
+    if (pathname.startsWith("/admin/analytics"))
+      return "Analytics";
+
+    if (pathname.startsWith("/admin/leaderboard"))
+      return "Leaderboards";
+
+    if (pathname.startsWith("/admin/certificates"))
+      return "Certificates";
+
+    if (pathname.startsWith("/admin/telegram"))
+      return "Telegram";
+
+    if (pathname.startsWith("/admin/settings"))
+      return "Settings";
+
+    return "Admin Panel";
+  }, [pathname]);
+
+  // ==========================================
+  // INITIALS
+  // ==========================================
+
+  const initials = useMemo(() => {
+    if (!admin?.full_name) return "AD";
+
+    return admin.full_name
+      .split(" ")
+      .map((word) => word.charAt(0))
+      .join("")
+      .substring(0, 2)
+      .toUpperCase();
+  }, [admin]);
+
+  // ==========================================
+  // UI
   // ==========================================
 
   return (
+    <header className="sticky top-0 z-30 border-b border-gray-200 bg-white">
 
-    <header className="bg-white border-b border-gray-200 px-8 py-5 sticky top-0 z-30">
-
-      <div className="flex items-center justify-between">
+      <div className="flex h-20 items-center justify-between px-4 md:px-8">
 
         {/* LEFT */}
 
-        <div>
+        <div className="flex items-center gap-4">
 
-          <h1 className="text-3xl font-black text-blue-900">
+          {/* Mobile Menu */}
 
-            {title}
+          <button
+            onClick={onMenuClick}
+            className="flex h-11 w-11 items-center justify-center rounded-lg border border-gray-300 lg:hidden"
+          >
+            <span className="text-2xl">☰</span>
+          </button>
 
-          </h1>
+          <div>
 
-          <p className="mt-1 text-gray-500">
+            <h1 className="text-2xl md:text-3xl font-black text-blue-900">
+              {title}
+            </h1>
 
-            Welcome back,
-            {" "}
-            <span className="font-semibold">
+            <p className="text-sm text-gray-500">
 
-              {admin?.full_name ||
-                "Administrator"}
+              Welcome back,&nbsp;
 
-            </span>
+              <span className="font-semibold">
 
-          </p>
+                {admin?.full_name ??
+                  "Administrator"}
+
+              </span>
+
+            </p>
+
+          </div>
 
         </div>
 
-        {/* CENTER */}
+        {/* SEARCH */}
 
-        <div className="hidden lg:block w-[420px]">
+        <div className="hidden xl:block w-[420px]">
 
           <input
-
             type="text"
-
-            placeholder="Search users, certificates, roadmaps..."
-
-            className="w-full rounded-xl border border-gray-300 px-5 py-3 outline-none focus:ring-2 focus:ring-orange-400"
-
+            placeholder="Search..."
+            className="w-full rounded-xl border border-gray-300 px-5 py-3 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-300"
           />
 
         </div>
@@ -141,27 +150,33 @@ export default function Header({
 
         <div className="flex items-center gap-5">
 
-          {/* CLOCK */}
+          {/* Notification */}
+
+          <button className="relative flex h-11 w-11 items-center justify-center rounded-xl border border-gray-300 hover:bg-gray-100">
+
+            🔔
+
+            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500"></span>
+
+          </button>
+
+          {/* Clock */}
 
           <div className="hidden md:block text-right">
 
             <p className="text-sm text-gray-500">
-
               {currentTime.toLocaleDateString()}
-
             </p>
 
             <p className="font-semibold text-blue-900">
-
               {currentTime.toLocaleTimeString()}
-
             </p>
 
           </div>
 
-          {/* AVATAR */}
+          {/* Avatar */}
 
-          <div className="w-12 h-12 rounded-full bg-blue-900 text-white flex items-center justify-center font-bold text-lg shadow">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-900 text-lg font-bold text-white shadow">
 
             {initials}
 
@@ -172,7 +187,5 @@ export default function Header({
       </div>
 
     </header>
-
   );
-
 }
