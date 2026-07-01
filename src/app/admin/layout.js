@@ -8,76 +8,34 @@ import Sidebar from "@/components/admin/Sidebar";
 import Header from "@/components/admin/Header";
 
 export default function AdminLayout({
-  children
+  children,
 }) {
-
-  const router =
-    useRouter();
-
-  const [admin, setAdmin] =
-    useState(null);
+  const router = useRouter();
 
   const [loading, setLoading] =
     useState(true);
 
   // =====================================
-  // LOAD ADMIN
+  // CHECK ADMIN TOKEN
   // =====================================
 
   useEffect(() => {
+    if (typeof window === "undefined")
+      return;
 
-    const storedUser =
-      localStorage.getItem(
-        "admin_user"
-      );
-
-    const storedToken =
+    const token =
       localStorage.getItem(
         "admin_token"
       );
 
-    if (
-      !storedUser ||
-      !storedToken
-    ) {
-
+    if (!token) {
       router.replace(
         "/admin/login"
       );
-
       return;
-
-    }
-
-    try {
-
-      const user =
-        JSON.parse(
-          storedUser
-        );
-
-      setAdmin(user);
-
-    } catch {
-
-      localStorage.removeItem(
-        "admin_user"
-      );
-
-      localStorage.removeItem(
-        "admin_token"
-      );
-
-      router.replace(
-        "/admin/login"
-      );
-
-      return;
-
     }
 
     setLoading(false);
-
   }, [router]);
 
   // =====================================
@@ -85,35 +43,26 @@ export default function AdminLayout({
   // =====================================
 
   if (loading) {
-
     return (
-
       <div className="min-h-screen flex items-center justify-center bg-slate-100">
-
         <div className="text-center">
 
           <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
 
           <p className="mt-6 text-blue-900 font-semibold">
-
             Loading Admin Panel...
-
           </p>
 
         </div>
-
       </div>
-
     );
-
   }
 
   // =====================================
-  // PAGE
+  // ADMIN LAYOUT
   // =====================================
 
   return (
-
     <AdminGuard>
 
       <div className="min-h-screen bg-slate-100">
@@ -122,18 +71,14 @@ export default function AdminLayout({
 
         <Sidebar />
 
-        {/* Content */}
+        {/* Main Content */}
 
-        <div className="lg:ml-72">
+        <div className="lg:ml-72 min-h-screen">
 
-          <Header
-            admin={admin}
-          />
+          <Header />
 
           <main className="p-8">
-
             {children}
-
           </main>
 
         </div>
@@ -141,7 +86,5 @@ export default function AdminLayout({
       </div>
 
     </AdminGuard>
-
   );
-
 }
