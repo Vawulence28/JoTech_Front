@@ -1,14 +1,20 @@
 import axios from "axios";
 
 // ==========================================
-// API
+// API INSTANCE
 // ==========================================
 
 const API = axios.create({
 
   baseURL:
     process.env.NEXT_PUBLIC_API_URL ||
-    "https://jo-tech-b7lk.onrender.com/api"
+    "https://jo-tech-b7lk.onrender.com/api",
+
+  headers: {
+    "Content-Type": "application/json",
+  },
+
+  timeout: 30000,
 
 });
 
@@ -54,16 +60,15 @@ API.interceptors.response.use(
 
     if (
 
-      error.response?.status === 401 &&
+      typeof window !== "undefined" &&
 
-      typeof window !== "undefined"
+      error.response?.status === 401
 
     ) {
 
       localStorage.removeItem("admin_token");
 
-      window.location.href =
-        "/admin/login";
+      window.location.replace("/admin/login");
 
     }
 
@@ -77,191 +82,131 @@ API.interceptors.response.use(
 // DASHBOARD
 // ==========================================
 
-export const getDashboardMetrics =
-  async () => {
+export const getDashboardMetrics = async () => {
 
-    const {
+  const { data } =
+    await API.get("/admin/dashboard");
 
-      data
+  return data;
 
-    } = await API.get(
-      "/admin/dashboard"
-    );
-
-    return data;
-
-  };
+};
 
 // ==========================================
 // USERS
 // ==========================================
 
-export const getUsers =
-  async (
+export const getUsers = async (
 
-    page = 1,
+  page = 1,
 
-    limit = 20
+  limit = 20
 
-  ) => {
+) => {
 
-    const {
-
-      data
-
-    } = await API.get(
-
+  const { data } =
+    await API.get(
       `/admin/users?page=${page}&limit=${limit}`
-
     );
 
-    return data;
+  return data;
 
-  };
+};
 
-export const searchUsers =
-  async (query) => {
+export const searchUsers = async (query) => {
 
-    const {
-
-      data
-
-    } = await API.get(
-
+  const { data } =
+    await API.get(
       `/admin/users/search?q=${encodeURIComponent(query)}`
-
     );
 
-    return data;
+  return data;
 
-  };
+};
 
-export const suspendUser =
-  async (id) => {
+export const suspendUser = async (id) => {
 
-    const {
-
-      data
-
-    } = await API.patch(
-
+  const { data } =
+    await API.patch(
       `/admin/users/${id}/suspend`
-
     );
 
-    return data;
+  return data;
 
-  };
+};
 
-export const activateUser =
-  async (id) => {
+export const activateUser = async (id) => {
 
-    const {
-
-      data
-
-    } = await API.patch(
-
+  const { data } =
+    await API.patch(
       `/admin/users/${id}/activate`
-
     );
 
-    return data;
+  return data;
 
-  };
+};
 
-export const deleteUser =
-  async (id) => {
+export const deleteUser = async (id) => {
 
-    const {
-
-      data
-
-    } = await API.delete(
-
+  const { data } =
+    await API.delete(
       `/admin/users/${id}`
-
     );
 
-    return data;
+  return data;
 
-  };
+};
 
 // ==========================================
 // ANALYTICS
 // ==========================================
 
-export const getAnalytics =
-  async () => {
+export const getAnalytics = async () => {
 
-    const {
+  const { data } =
+    await API.get("/admin/analytics");
 
-      data
+  return data;
 
-    } = await API.get(
-      "/admin/analytics"
-    );
-
-    return data;
-
-  };
+};
 
 // ==========================================
 // LEADERBOARD
 // ==========================================
 
-export const getLeaderboard =
-  async () => {
+export const getLeaderboard = async () => {
 
-    const {
+  const { data } =
+    await API.get("/admin/leaderboard");
 
-      data
+  return data;
 
-    } = await API.get(
-      "/admin/leaderboard"
-    );
-
-    return data;
-
-  };
+};
 
 // ==========================================
 // TELEGRAM
 // ==========================================
 
-export const getTelegramStats =
-  async () => {
+export const getTelegramStats = async () => {
 
-    const {
+  const { data } =
+    await API.get("/admin/telegram");
 
-      data
+  return data;
 
-    } = await API.get(
-      "/admin/telegram"
-    );
-
-    return data;
-
-  };
+};
 
 // ==========================================
 // CERTIFICATES
 // ==========================================
 
-export const getCertificates =
-  async () => {
+export const getCertificates = async () => {
 
-    const {
+  const { data } =
+    await API.get("/admin/certificates");
 
-      data
+  return data;
 
-    } = await API.get(
-      "/admin/certificates"
-    );
-
-    return data;
-
-  };
+};
 
 // ==========================================
 // EXPORT

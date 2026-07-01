@@ -2,33 +2,25 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAnalytics } from "@/lib/api";
+import API from "@/lib/api";
 
 // ==========================================
 // ADMIN GUARD
 // ==========================================
 //
-// Protects every Admin page.
+// Protects all Admin pages by:
 //
-// Flow
-// -----
-// 1. Ensure JWT exists
-// 2. Verify token
-// 3. Confirm user role = admin
-// 4. Show loading while checking
-// 5. Redirect unauthorized users
-//
-// Usage:
-//
-// <AdminGuard>
-//     <Dashboard />
-// </AdminGuard>
+// 1. Checking for an admin token
+// 2. Verifying the token with the backend
+// 3. Confirming the authenticated user is an admin
+// 4. Redirecting unauthenticated users
 //
 // ==========================================
 
 export default function AdminGuard({
   children,
 }) {
+
   const router = useRouter();
 
   const [checking, setChecking] =
@@ -37,68 +29,113 @@ export default function AdminGuard({
   const [authorized, setAuthorized] =
     useState(false);
 
+  // ==========================================
+  // VERIFY ADMIN
+  // ==========================================
+
   useEffect(() => {
+
     verifyAdmin();
+
   }, []);
 
   async function verifyAdmin() {
+
     try {
+
       const token =
-        localStorage.getItem("token");
-
-      if (!token) {
-        router.replace("/login");
-        return;
-      }
-
-      const response =
-        await api.get(
-          "/api/admin/dashboard"
+        localStorage.getItem(
+          "admin_token"
         );
 
-      if (
-        response.data?.success === true
-      ) {
-        setAuthorized(true);
-      } else {
-        router.replace("/");
+      if (!token) {
+
+        router.replace(
+          "/admin/login"
+        );
+
+        return;
+
       }
+
+      // Backend middleware verifies JWT
+      // and confirms role === admin
+
+      const {
+        data
+      } = await API.get(
+        "/admin/dashboard"
+      );
+
+      if (
+        data?.success === true
+      ) {
+
+        setAuthorized(true);
+
+      } else {
+
+        localStorage.removeItem(
+          "admin_token"
+        );
+
+        router.replace(
+          "/admin/login"
+        );
+
+      }
+
     } catch (error) {
+
       console.error(
         "Admin authentication failed:",
         error
       );
 
-      localStorage.removeItem("token");
+      localStorage.removeItem(
+        "admin_token"
+      );
 
-      router.replace("/login");
+      router.replace(
+        "/admin/login"
+      );
+
     } finally {
+
       setChecking(false);
+
     }
+
   }
 
   // ==========================================
-  // LOADING SCREEN
+  // LOADING
   // ==========================================
 
   if (checking) {
+
     return (
+
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
+
         <div className="text-center">
 
           <div className="w-14 h-14 border-4 border-blue-900 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
 
-          <h2 className="text-xl font-semibold text-blue-900">
-            Verifying Administrator
+          <h2 className="text-2xl font-bold text-blue-900">
+            Loading Admin Panel...
           </h2>
 
-          <p className="mt-2 text-gray-500">
-            Please wait...
+          <p className="mt-3 text-gray-500">
+            Verifying administrator credentials.
           </p>
 
         </div>
+
       </div>
+
     );
+
   }
 
   // ==========================================
@@ -106,12 +143,15 @@ export default function AdminGuard({
   // ==========================================
 
   if (!authorized) {
+
     return null;
+
   }
 
   // ==========================================
-  // ALLOW ACCESS
+  // RENDER ADMIN PAGE
   // ==========================================
 
   return children;
+
 }
