@@ -2,156 +2,106 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import API from "@/lib/api";
+import { getDashboardMetrics } from "@/services/adminApi";
 
 // ==========================================
 // ADMIN GUARD
 // ==========================================
 //
-// Protects all Admin pages by:
+// Protects all Admin pages.
 //
-// 1. Checking for an admin token
-// 2. Verifying the token with the backend
-// 3. Confirming the authenticated user is an admin
-// 4. Redirecting unauthenticated users
+// Responsibilities
+// ----------------
+// • Check for admin token
+// • Verify token with backend
+// • Ensure authenticated user is an admin
+// • Redirect unauthorized users
 //
 // ==========================================
 
-export default function AdminGuard({
-  children,
-}) {
-
+export default function AdminGuard({ children }) {
   const router = useRouter();
 
-  const [checking, setChecking] =
-    useState(true);
-
-  const [authorized, setAuthorized] =
-    useState(false);
+  const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
 
   // ==========================================
-  // VERIFY ADMIN
+  // VERIFY ADMIN SESSION
   // ==========================================
 
   useEffect(() => {
+    const verifyAdmin = async () => {
+      try {
+        if (typeof window === "undefined") return;
+
+        const token = localStorage.getItem("admin_token");
+
+        if (!token) {
+          router.replace("/admin/login");
+          return;
+        }
+
+        // Backend validates JWT + admin role
+        const response = await getDashboardMetrics();
+
+        if (response?.success) {
+          setAuthorized(true);
+        } else {
+          localStorage.removeItem("admin_token");
+          localStorage.removeItem("admin_user");
+
+          router.replace("/admin/login");
+        }
+      } catch (error) {
+        console.error("Admin authentication failed:", error);
+
+        localStorage.removeItem("admin_token");
+        localStorage.removeItem("admin_user");
+
+        router.replace("/admin/login");
+      } finally {
+        setLoading(false);
+      }
+    };
 
     verifyAdmin();
-
-  }, []);
-
-  async function verifyAdmin() {
-
-    try {
-
-      const token =
-        localStorage.getItem(
-          "admin_token"
-        );
-
-      if (!token) {
-
-        router.replace(
-          "/admin/login"
-        );
-
-        return;
-
-      }
-
-      // Backend middleware verifies JWT
-      // and confirms role === admin
-
-      const {
-        data
-      } = await API.get(
-        "/admin/dashboard"
-      );
-
-      if (
-        data?.success === true
-      ) {
-
-        setAuthorized(true);
-
-      } else {
-
-        localStorage.removeItem(
-          "admin_token"
-        );
-
-        router.replace(
-          "/admin/login"
-        );
-
-      }
-
-    } catch (error) {
-
-      console.error(
-        "Admin authentication failed:",
-        error
-      );
-
-      localStorage.removeItem(
-        "admin_token"
-      );
-
-      router.replace(
-        "/admin/login"
-      );
-
-    } finally {
-
-      setChecking(false);
-
-    }
-
-  }
+  }, [router]);
 
   // ==========================================
-  // LOADING
+  // LOADING SCREEN
   // ==========================================
 
-  if (checking) {
-
+  if (loading) {
     return (
-
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-
+      <div className="min-h-screen flex items-center justify-center bg-slate-100">
         <div className="text-center">
 
-          <div className="w-14 h-14 border-4 border-blue-900 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+          <div className="mx-auto h-14 w-14 animate-spin rounded-full border-4 border-blue-900 border-t-transparent"></div>
 
-          <h2 className="text-2xl font-bold text-blue-900">
+          <h1 className="mt-6 text-2xl font-bold text-blue-900">
             Loading Admin Panel...
-          </h2>
+          </h1>
 
-          <p className="mt-3 text-gray-500">
+          <p className="mt-2 text-gray-500">
             Verifying administrator credentials.
           </p>
 
         </div>
-
       </div>
-
     );
-
   }
 
   // ==========================================
-  // BLOCK RENDERING
+  // UNAUTHORIZED
   // ==========================================
 
   if (!authorized) {
-
     return null;
-
   }
 
   // ==========================================
-  // RENDER ADMIN PAGE
+  // AUTHORIZED
   // ==========================================
 
-  return children;
-
+  return <>{children}</>;
 }

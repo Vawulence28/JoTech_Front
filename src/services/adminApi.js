@@ -1,11 +1,21 @@
 import axios from "axios";
 
 // ==========================================
-// API INSTANCE
+// ADMIN API CLIENT
+// ==========================================
+//
+// Central API client for the Admin Panel.
+//
+// Responsibilities
+// ----------------
+// • Configure Axios
+// • Attach JWT automatically
+// • Handle expired sessions
+// • Expose helper functions
+//
 // ==========================================
 
 const API = axios.create({
-
   baseURL:
     process.env.NEXT_PUBLIC_API_URL ||
     "https://jo-tech-b7lk.onrender.com/api",
@@ -15,7 +25,6 @@ const API = axios.create({
   },
 
   timeout: 30000,
-
 });
 
 // ==========================================
@@ -23,29 +32,19 @@ const API = axios.create({
 // ==========================================
 
 API.interceptors.request.use(
-
   (config) => {
-
     if (typeof window !== "undefined") {
-
-      const token =
-        localStorage.getItem("admin_token");
+      const token = localStorage.getItem("admin_token");
 
       if (token) {
-
-        config.headers.Authorization =
-          `Bearer ${token}`;
-
+        config.headers.Authorization = `Bearer ${token}`;
       }
-
     }
 
     return config;
-
   },
 
   (error) => Promise.reject(error)
-
 );
 
 // ==========================================
@@ -53,163 +52,190 @@ API.interceptors.request.use(
 // ==========================================
 
 API.interceptors.response.use(
-
   (response) => response,
 
   (error) => {
-
     if (
-
       typeof window !== "undefined" &&
-
       error.response?.status === 401
-
     ) {
-
       localStorage.removeItem("admin_token");
+      localStorage.removeItem("admin_user");
 
-      window.location.replace("/admin/login");
-
+      // Prevent redirect loop while already on login page
+      if (
+        !window.location.pathname.startsWith("/admin/login")
+      ) {
+        window.location.replace("/admin/login");
+      }
     }
 
     return Promise.reject(error);
-
   }
-
 );
 
 // ==========================================
 // DASHBOARD
 // ==========================================
 
-export const getDashboardMetrics = async () => {
+export async function getDashboardMetrics() {
+  const { data } = await API.get("/admin/dashboard");
+  return data;
+}
 
-  const { data } =
-    await API.get("/admin/dashboard");
+export async function getRecentUsers(limit = 10) {
+  const { data } = await API.get(
+    `/admin/dashboard/recent-users?limit=${limit}`
+  );
 
   return data;
+}
 
-};
+export async function getDashboardTelegramStats() {
+  const { data } = await API.get(
+    "/admin/dashboard/telegram"
+  );
+
+  return data;
+}
+
+export async function getDashboardDropOffUsers() {
+  const { data } = await API.get(
+    "/admin/dashboard/dropoff"
+  );
+
+  return data;
+}
 
 // ==========================================
-// USERS
+// USER MANAGEMENT
 // ==========================================
 
-export const getUsers = async (
-
+export async function getUsers(
   page = 1,
-
   limit = 20
-
-) => {
-
-  const { data } =
-    await API.get(
-      `/admin/users?page=${page}&limit=${limit}`
-    );
+) {
+  const { data } = await API.get(
+    `/admin/users?page=${page}&limit=${limit}`
+  );
 
   return data;
+}
 
-};
-
-export const searchUsers = async (query) => {
-
-  const { data } =
-    await API.get(
-      `/admin/users/search?q=${encodeURIComponent(query)}`
-    );
+export async function searchUsers(query) {
+  const { data } = await API.get(
+    `/admin/users/search?q=${encodeURIComponent(query)}`
+  );
 
   return data;
+}
 
-};
-
-export const suspendUser = async (id) => {
-
-  const { data } =
-    await API.patch(
-      `/admin/users/${id}/suspend`
-    );
+export async function suspendUser(id) {
+  const { data } = await API.patch(
+    `/admin/users/${id}/suspend`
+  );
 
   return data;
+}
 
-};
-
-export const activateUser = async (id) => {
-
-  const { data } =
-    await API.patch(
-      `/admin/users/${id}/activate`
-    );
+export async function activateUser(id) {
+  const { data } = await API.patch(
+    `/admin/users/${id}/activate`
+  );
 
   return data;
+}
 
-};
-
-export const deleteUser = async (id) => {
-
-  const { data } =
-    await API.delete(
-      `/admin/users/${id}`
-    );
+export async function deleteUser(id) {
+  const { data } = await API.delete(
+    `/admin/users/${id}`
+  );
 
   return data;
-
-};
+}
 
 // ==========================================
 // ANALYTICS
 // ==========================================
 
-export const getAnalytics = async () => {
-
-  const { data } =
-    await API.get("/admin/analytics");
-
-  return data;
-
-};
-
-// ==========================================
-// LEADERBOARD
-// ==========================================
-
-export const getLeaderboard = async () => {
-
-  const { data } =
-    await API.get("/admin/leaderboard");
+export async function getAnalytics() {
+  const { data } = await API.get(
+    "/admin/analytics"
+  );
 
   return data;
+}
 
-};
-
-// ==========================================
-// TELEGRAM
-// ==========================================
-
-export const getTelegramStats = async () => {
-
-  const { data } =
-    await API.get("/admin/telegram");
+export async function getGrowthAnalytics() {
+  const { data } = await API.get(
+    "/admin/analytics/growth"
+  );
 
   return data;
+}
 
-};
-
-// ==========================================
-// CERTIFICATES
-// ==========================================
-
-export const getCertificates = async () => {
-
-  const { data } =
-    await API.get("/admin/certificates");
+export async function getLearningAnalytics() {
+  const { data } = await API.get(
+    "/admin/analytics/learning"
+  );
 
   return data;
+}
 
-};
+export async function getDropOffAnalytics() {
+  const { data } = await API.get(
+    "/admin/analytics/dropoff"
+  );
+
+  return data;
+}
+
+export async function getTelegramAnalytics() {
+  const { data } = await API.get(
+    "/admin/analytics/telegram"
+  );
+
+  return data;
+}
+
+export async function getCourseAnalytics() {
+  const { data } = await API.get(
+    "/admin/analytics/courses"
+  );
+
+  return data;
+}
 
 // ==========================================
-// EXPORT
+// LEADERBOARDS
+// ==========================================
+
+export async function getLeaderboard() {
+  const { data } = await API.get(
+    "/admin/leaderboard"
+  );
+
+  return data;
+}
+
+export async function getXPLeaderboard() {
+  const { data } = await API.get(
+    "/admin/leaderboard/xp"
+  );
+
+  return data;
+}
+
+export async function getStreakLeaderboard() {
+  const { data } = await API.get(
+    "/admin/leaderboard/streaks"
+  );
+
+  return data;
+}
+
+// ==========================================
+// RAW API INSTANCE
 // ==========================================
 
 export default API;
