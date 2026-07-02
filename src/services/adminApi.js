@@ -259,19 +259,114 @@ export async function revokeCertificate(id){
 }
 
 // ==========================================
-// DEFAULT EXPORT
+// TELEGRAM
 // ==========================================
-//
-// Supports:
-//
-// import adminApi from "...";
-//
-// adminApi.getUsers();
-// adminApi.getDashboard();
-// adminApi.getAnalytics();
-//
-// while still exposing the Axios instance.
-//
+
+export async function getTelegramDashboard() {
+  const { data } = await API.get(
+    "/admin/telegram"
+  );
+
+  return data;
+}
+
+export async function getTelegramOverview() {
+  const { data } = await API.get(
+    "/admin/telegram/overview"
+  );
+
+  return data;
+}
+
+export async function getTelegramLinkedUsers() {
+  const { data } = await API.get(
+    "/admin/telegram/linked-users"
+  );
+
+  return data;
+}
+
+export async function getTelegramUnlinkedUsers() {
+  const { data } = await API.get(
+    "/admin/telegram/unlinked-users"
+  );
+
+  return data;
+}
+
+export async function getTelegramMessages() {
+  const { data } = await API.get(
+    "/admin/telegram/messages"
+  );
+
+  return data;
+}
+
+export async function getTelegramBot() {
+  const { data } = await API.get(
+    "/admin/telegram/bot"
+  );
+
+  return data;
+}
+
+// ==========================================
+// MESSAGES
+// ==========================================
+
+export async function getMessageHistory() {
+  const { data } = await API.get(
+    "/admin/messages/history"
+  );
+
+  return data;
+}
+
+export async function getMessageTemplates() {
+  const { data } = await API.get(
+    "/admin/messages/templates"
+  );
+
+  return data;
+}
+
+export async function sendBroadcast(payload) {
+  const { data } = await API.post(
+    "/admin/messages/broadcast",
+    payload
+  );
+
+  return data;
+}
+
+export async function sendMessage(payload) {
+  const { data } = await API.post(
+    "/admin/messages/send",
+    payload
+  );
+
+  return data;
+}
+
+export async function createMessageTemplate(payload) {
+  const { data } = await API.post(
+    "/admin/messages/templates",
+    payload
+  );
+
+  return data;
+}
+
+export async function deleteMessageTemplate(id) {
+  const { data } = await API.delete(
+    `/admin/messages/templates/${id}`
+  );
+
+  return data;
+}
+
+// ==========================================
+// DEFAULT EXPORT
 // ==========================================
 
 const adminApi = {
