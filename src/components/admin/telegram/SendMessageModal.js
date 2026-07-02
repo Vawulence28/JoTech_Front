@@ -298,7 +298,7 @@ async function handleSend() {
     setSending(true);
 
     if (user) {
-      await sendIndividualMessage({
+      await sendMessage({
         userId: user.id,
         title,
         message,

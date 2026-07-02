@@ -13,7 +13,7 @@ import {
   getTelegramUsers,
   getMessageTemplates,
   getMessageHistory,
-} from "@/services/adminTelegramApi";
+} from "@/services/adminApi";
 
 export default function AdminTelegramPage() {
   // ==========================================
