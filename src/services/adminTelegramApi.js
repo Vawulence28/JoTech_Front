@@ -240,7 +240,7 @@ export default {
   createMessageTemplate,
   updateMessageTemplate,
   deleteMessageTemplate,
-  sendIndividualMessage,
+  sendMessage,
   sendBroadcast,
 
   // Analytics

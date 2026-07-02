@@ -12,7 +12,9 @@ export default function MessageHistoryTable({
     useState("all");
 
   const filteredHistory = useMemo(() => {
-    return history.filter((item) => {
+    const list = Array.isArray(history) ? history : [];
+
+    return list.filter((item) => {
       const keyword =
         `${item.title || ""} ${item.recipient_name || ""} ${item.recipient_type || ""}`
           .toLowerCase();
@@ -271,7 +273,7 @@ export default function MessageHistoryTable({
         </strong>{" "}
         of{" "}
         <strong>
-          {history.length}
+          {Array.isArray(history) ? history.length : 0}
         </strong>{" "}
         messages.
 

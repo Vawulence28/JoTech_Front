@@ -197,10 +197,6 @@ export async function getCourseAnalytics() {
   return data;
 }
 
-// ==========================================
-// LEADERBOARDS
-// ==========================================
-
 export async function getLeaderboard() {
   const { data } = await API.get(
     "/admin/leaderboard"
@@ -258,13 +254,36 @@ export async function revokeCertificate(id){
   return data;
 }
 
-// ==========================================
-// TELEGRAM
-// ==========================================
-
 export async function getTelegramDashboard() {
   const { data } = await API.get(
-    "/admin/telegram"
+    "/admin/telegram/dashboard"
+  );
+
+  return data;
+}
+
+export async function getTelegramStatistics() {
+  const { data } = await API.get(
+    "/admin/telegram/statistics"
+  );
+
+  return data;
+}
+
+export async function getTelegramSettings() {
+  const { data } = await API.get(
+    "/admin/telegram/settings"
+  );
+
+  return data;
+}
+
+export async function saveTelegramSettings(
+  payload
+) {
+  const { data } = await API.put(
+    "/admin/telegram/settings",
+    payload
   );
 
   return data;
@@ -310,13 +329,53 @@ export async function getTelegramBot() {
   return data;
 }
 
-// ==========================================
-// MESSAGES
-// ==========================================
-
-export async function getMessageHistory() {
+export async function getTelegramUsers(
+  page = 1,
+  limit = 20
+) {
   const { data } = await API.get(
-    "/admin/messages/history"
+    `/admin/telegram/users?page=${page}&limit=${limit}`
+  );
+
+  return data;
+}
+
+export async function searchTelegramUsers(
+  query
+) {
+  const { data } = await API.get(
+    `/admin/telegram/users/search?q=${encodeURIComponent(
+      query
+    )}`
+  );
+
+  return data;
+}
+
+export async function getTelegramUser(id) {
+  const { data } = await API.get(
+    `/admin/telegram/users/${id}`
+  );
+
+  return data;
+}
+
+export async function unlinkTelegramUser(
+  id
+) {
+  const { data } = await API.patch(
+    `/admin/telegram/users/${id}/unlink`
+  );
+
+  return data;
+}
+
+export async function getMessageHistory(
+  page = 1,
+  limit = 50
+) {
+  const { data } = await API.get(
+    `/admin/messages/history?page=${page}&limit=${limit}`
   );
 
   return data;
@@ -357,6 +416,18 @@ export async function createMessageTemplate(payload) {
   return data;
 }
 
+export async function updateMessageTemplate(
+  id,
+  payload
+) {
+  const { data } = await API.put(
+    `/admin/messages/templates/${id}`,
+    payload
+  );
+
+  return data;
+}
+
 export async function deleteMessageTemplate(id) {
   const { data } = await API.delete(
     `/admin/messages/templates/${id}`
@@ -365,39 +436,170 @@ export async function deleteMessageTemplate(id) {
   return data;
 }
 
+export async function getBroadcastStatistics() {
+  const { data } = await API.get(
+    "/admin/messages/statistics"
+  );
+
+  return data;
+}
+
+export async function getMessageFailures() {
+  const { data } = await API.get(
+    "/admin/messages/failures"
+  );
+
+  return data;
+}
+
+export async function getBotStatus() {
+  const { data } = await API.get(
+    "/admin/telegram/bot/status"
+  );
+
+  return data;
+}
+
+export async function restartBot() {
+  const { data } = await API.post(
+    "/admin/telegram/bot/restart"
+  );
+
+  return data;
+}
+
+export async function sendTestMessage(
+  telegramId
+) {
+  const { data } = await API.post(
+    "/admin/telegram/bot/test",
+    {
+      telegramId,
+    }
+  );
+
+  return data;
+}
+
+
 // ==========================================
 // DEFAULT EXPORT
 // ==========================================
 
-const adminApi = {
-  api: API,
+const adminApi = API;
 
-  getDashboard,
-  getDashboardMetrics,
+// Dashboard
+adminApi.getDashboard = getDashboard;
+adminApi.getDashboardMetrics =
+  getDashboardMetrics;
+adminApi.getRecentUsers =
+  getRecentUsers;
+adminApi.getDashboardTelegramStats =
+  getDashboardTelegramStats;
+adminApi.getDashboardDropOffUsers =
+  getDashboardDropOffUsers;
 
-  getRecentUsers,
-  getDashboardTelegramStats,
-  getDashboardDropOffUsers,
+// Users
+adminApi.getUsers = getUsers;
+adminApi.searchUsers = searchUsers;
+adminApi.suspendUser = suspendUser;
+adminApi.activateUser = activateUser;
+adminApi.deleteUser = deleteUser;
 
-  getUsers,
-  searchUsers,
-  suspendUser,
-  activateUser,
-  deleteUser,
+// Analytics
+adminApi.getAnalytics = getAnalytics;
+adminApi.getGrowthAnalytics =
+  getGrowthAnalytics;
+adminApi.getLearningAnalytics =
+  getLearningAnalytics;
+adminApi.getDropOffAnalytics =
+  getDropOffAnalytics;
+adminApi.getTelegramAnalytics =
+  getTelegramAnalytics;
+adminApi.getCourseAnalytics =
+  getCourseAnalytics;
 
-  getAnalytics,
-  getGrowthAnalytics,
-  getLearningAnalytics,
-  getDropOffAnalytics,
-  getTelegramAnalytics,
-  getCourseAnalytics,
+// Leaderboards
+adminApi.getLeaderboard =
+  getLeaderboard;
+adminApi.getXPLeaderboard =
+  getXPLeaderboard;
+adminApi.getStreakLeaderboard =
+  getStreakLeaderboard;
 
-  getLeaderboard,
-  getXPLeaderboard,
-  getStreakLeaderboard,
+// Settings
+adminApi.getSettings = getSettings;
+adminApi.updateSettings =
+  updateSettings;
 
-  getSettings,
-  updateSettings,
-};
+// Certificates
+adminApi.getCertificates =
+  getCertificates;
+adminApi.revokeCertificate =
+  revokeCertificate;
+
+// Telegram Dashboard
+adminApi.getTelegramDashboard =
+  getTelegramDashboard;
+adminApi.getTelegramStatistics =
+  getTelegramStatistics;
+adminApi.getTelegramSettings =
+  getTelegramSettings;
+adminApi.saveTelegramSettings =
+  saveTelegramSettings;
+
+// Telegram Users
+adminApi.getTelegramUsers =
+  getTelegramUsers;
+adminApi.searchTelegramUsers =
+  searchTelegramUsers;
+adminApi.getTelegramUser =
+  getTelegramUser;
+adminApi.unlinkTelegramUser =
+  unlinkTelegramUser;
+
+// Telegram Overview
+adminApi.getTelegramOverview =
+  getTelegramOverview;
+adminApi.getTelegramLinkedUsers =
+  getTelegramLinkedUsers;
+adminApi.getTelegramUnlinkedUsers =
+  getTelegramUnlinkedUsers;
+adminApi.getTelegramMessages =
+  getTelegramMessages;
+adminApi.getTelegramBot =
+  getTelegramBot;
+
+// Messages
+adminApi.getMessageHistory =
+  getMessageHistory;
+adminApi.getMessageTemplates =
+  getMessageTemplates;
+adminApi.createMessageTemplate =
+  createMessageTemplate;
+adminApi.updateMessageTemplate =
+  updateMessageTemplate;
+adminApi.deleteMessageTemplate =
+  deleteMessageTemplate;
+adminApi.sendMessage =
+  sendMessage;
+adminApi.sendBroadcast =
+  sendBroadcast;
+
+// Message Analytics
+adminApi.getBroadcastStatistics =
+  getBroadcastStatistics;
+adminApi.getMessageFailures =
+  getMessageFailures;
+
+// Telegram Bot
+adminApi.getBotStatus =
+  getBotStatus;
+adminApi.restartBot =
+  restartBot;
+adminApi.sendTestMessage =
+  sendTestMessage;
+
+export { API };
 
 export default adminApi;
