@@ -68,9 +68,7 @@ export default function AdminTelegramPage() {
         const result =
           await getTelegramDashboard();
 
-        setDashboard(
-          result.data || {}
-        );
+        setDashboard(result.data?.overview || {});
       } catch (error) {
         console.error(
           "Dashboard Error",
@@ -421,7 +419,7 @@ export default function AdminTelegramPage() {
           </p>
 
           <h3 className="mt-3 text-3xl font-bold text-blue-700">
-            {dashboard.messagesToday ?? 0}
+            dashboard.totalMessages ?? 0
           </h3>
 
         </div>

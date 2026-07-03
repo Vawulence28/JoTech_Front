@@ -43,21 +43,15 @@ export default function AdminAnalyticsPage() {
     );
   }
 
-  const dashboard = analytics.dashboard ?? {};
+  const growth = analytics.growth ?? {};
 
-  const users = dashboard.users ?? {};
+  const telegram = analytics.telegram ?? {};
 
-  const telegram = dashboard.telegram ?? {};
+  const learning = analytics.learning ?? {};
 
-  const lessons = dashboard.lessons ?? {};
+  const dropOff = analytics.dropOff ?? {};
 
-  const certificates = dashboard.certificates ?? {};
-
-  const roadmaps = dashboard.roadmaps ?? {};
-
-  const activeLearners = dashboard.activeLearners ?? {};
-
-  const dropOff = dashboard.dropOff ?? {};
+  const courses = analytics.courses ?? {};
 
   return (
     <div className="space-y-8">
@@ -76,22 +70,22 @@ export default function AdminAnalyticsPage() {
 
         <Card
           title="Total Users"
-          value={users.totalUsers ?? 0}
+          value={growth.totalUsers ?? 0}
         />
 
         <Card
           title="New Today"
-          value={users.newToday ?? 0}
+          value={growth.newToday ?? 0}
         />
 
         <Card
           title="New This Week"
-          value={users.newThisWeek ?? 0}
+          value={growth.newThisWeek ?? 0}
         />
 
         <Card
           title="New This Month"
-          value={users.newThisMonth ?? 0}
+          value={growth.newThisMonth ?? 0}
         />
 
         <Card
@@ -106,32 +100,32 @@ export default function AdminAnalyticsPage() {
 
         <Card
           title="Completed Lessons"
-          value={lessons.completedLessons ?? 0}
+          value={learning.completedLessons ?? 0}
         />
 
         <Card
           title="Certificates Issued"
-          value={certificates.certificatesIssued ?? 0}
+          value={learning.certificates ?? 0}
         />
 
         <Card
           title="Total Roadmaps"
-          value={roadmaps.totalRoadmaps ?? 0}
+          value={courses.totalCourses ?? 0}
         />
 
         <Card
           title="Active Roadmaps"
-          value={roadmaps.activeRoadmaps ?? 0}
+          value={learning.activeRoadmaps ?? 0}
         />
 
         <Card
           title="Completed Roadmaps"
-          value={roadmaps.completedRoadmaps ?? 0}
+          value={learning.completedRoadmaps ?? 0}
         />
 
         <Card
           title="Active Learners Today"
-          value={activeLearners.activeToday ?? 0}
+          value={learning.activeLearners ?? 0}
         />
 
         <Card
