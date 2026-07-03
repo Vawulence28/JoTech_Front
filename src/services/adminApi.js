@@ -238,17 +238,17 @@ export async function updateSettings(payload) {
   return data;
 }
 
-export async function getCertificates(){
-  const {data}=await API.get(
+export async function getCertificates() {
+  const { data } = await API.get(
     "/admin/certificates"
   );
 
   return data;
 }
 
-export async function revokeCertificate(id){
-  const {data}=await API.patch(
-    `/admin/certificates/${id}/revoke`
+export async function getCertificate(id) {
+  const { data } = await API.get(
+    `/admin/certificates/${id}`
   );
 
   return data;
@@ -535,8 +535,8 @@ adminApi.updateSettings =
 // Certificates
 adminApi.getCertificates =
   getCertificates;
-adminApi.revokeCertificate =
-  revokeCertificate;
+adminApi.getCertificate =
+  getCertificate;
 
 // Telegram Dashboard
 adminApi.getTelegramDashboard =
