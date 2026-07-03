@@ -15,9 +15,8 @@ export default function AdminLeaderboardPage() {
     try {
       setLoading(true);
       const res = await adminApi.getLeaderboard();
-      setLeaders(
-        Array.isArray(res.data) ? res.data : []
-      );
+
+      setLeaders(res.data.xpLeaderboard || []);
     } catch (err) {
       console.error("Leaderboard error", err);
     } finally {
@@ -47,9 +46,9 @@ export default function AdminLeaderboardPage() {
 
             <tbody>
               {leaders.map((u, index) => (
-                <tr key={u.id} className="text-center">
+                <tr key={u.learn_users?.id} className="text-center">
                   <td className="p-2 border">{index + 1}</td>
-                  <td className="p-2 border">{u.full_name}</td>
+                  <td className="p-2 border">{u.learn_users?.full_name}</td>
                   <td className="p-2 border">{u.total_xp}</td>
                   <td className="p-2 border">{u.level}</td>
                 </tr>

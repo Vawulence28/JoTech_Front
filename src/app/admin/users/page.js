@@ -30,7 +30,7 @@ export default function AdminUsersPage() {
 
           : await adminApi.searchUsers(search);
 
-      setUsers(Array.isArray(response.data) ? response.data : []);
+      setUsers(response.data.users || []);
 
       console.log(response);
 
@@ -302,7 +302,7 @@ export default function AdminUsersPage() {
 
                 <td className="p-4">
 
-                  {user.is_active ? (
+                  {user.account_status === "active" ? (
 
                     <span className="text-green-600 font-semibold">
 
@@ -324,7 +324,7 @@ export default function AdminUsersPage() {
 
                 <td className="p-4">
 
-                  {user.telegram_linked
+                  {Boolean(user.telegram_chat_id)
                     ? "✅"
                     : "—"}
 
@@ -334,7 +334,7 @@ export default function AdminUsersPage() {
 
                   <div className="flex justify-end gap-2">
 
-                    {user.is_active ? (
+                    {user.account_status === "active" ? (
 
                       <button
                         disabled={
