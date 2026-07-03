@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 
 import {
-  sendBroadcast,
   sendMessage,
+  sendBroadcast,
 } from "@/services/adminApi";
 
 export default function SendMessageModal({
@@ -15,7 +15,10 @@ export default function SendMessageModal({
   refresh,
 }) {
   const [recipientType, setRecipientType] =
-    useState("individual");
+    useState("telegram");
+
+  const [templateId, setTemplateId] =
+    useState("");
 
   const [title, setTitle] =
     useState("");
@@ -23,31 +26,36 @@ export default function SendMessageModal({
   const [message, setMessage] =
     useState("");
 
-  const [templateId, setTemplateId] =
-    useState("");
-
   const [sending, setSending] =
     useState(false);
 
+  // ==========================================
+  // RESET MODAL
+  // ==========================================
+
   useEffect(() => {
     if (!open) return;
+
+    setTemplateId("");
+    setTitle("");
+    setMessage("");
 
     if (user) {
       setRecipientType("individual");
     } else {
       setRecipientType("telegram");
     }
-
-    setTitle("");
-    setMessage("");
-    setTemplateId("");
   }, [open, user]);
+
+  // ==========================================
+  // TEMPLATE
+  // ==========================================
 
   function chooseTemplate(id) {
     setTemplateId(id);
 
     const template = templates.find(
-      (t) => t.id === id
+      (item) => item.id === id
     );
 
     if (!template) return;
@@ -56,30 +64,87 @@ export default function SendMessageModal({
     setMessage(template.body || "");
   }
 
+  // ==========================================
+  // SEND
+  // ==========================================
+
+  async function handleSend() {
+    if (!title.trim()) {
+      alert("Please enter a title.");
+      return;
+    }
+
+    if (!message.trim()) {
+      alert("Please enter a message.");
+      return;
+    }
+
+    try {
+      setSending(true);
+
+      if (user) {
+        await sendMessage({
+          userId: user.id,
+          title,
+          message,
+          channel: "telegram",
+        });
+
+        alert("Message sent successfully.");
+      } else {
+        await sendBroadcast({
+          recipientType,
+          title,
+          message,
+          channel: "telegram",
+        });
+
+        alert("Broadcast sent successfully.");
+      }
+
+      await refresh?.();
+
+      onClose?.();
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        error?.response?.data?.message ||
+          "Unable to send message."
+      );
+    } finally {
+      setSending(false);
+    }
+  }
+
+  // ==========================================
+  // CLOSE
+  // ==========================================
+
   if (!open) return null;
+
+  // ==========================================
+  // UI
+  // ==========================================
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6">
 
-      <div className="w-full max-w-2xl rounded-xl bg-white shadow-xl">
+      <div className="w-full max-w-3xl rounded-xl bg-white shadow-xl">
 
         {/* Header */}
 
         <div className="border-b px-6 py-5">
 
           <h2 className="text-2xl font-bold">
-
             {user
               ? `Send Message to ${user.full_name}`
               : "Broadcast Message"}
-
           </h2>
 
           <p className="mt-2 text-sm text-slate-500">
-
-            Messages are delivered through
-            the Telegram bot immediately.
-
+            Messages will be delivered through
+            the Telegram Bot.
           </p>
 
         </div>
@@ -93,9 +158,7 @@ export default function SendMessageModal({
             <div>
 
               <label className="mb-2 block text-sm font-medium">
-
-                Recipients
-
+                Recipient Group
               </label>
 
               <select
@@ -107,16 +170,17 @@ export default function SendMessageModal({
                 }
                 className="w-full rounded-lg border p-3"
               >
+
                 <option value="telegram">
                   Telegram Users
                 </option>
 
                 <option value="all">
-                  All Students
+                  All Users
                 </option>
 
                 <option value="active">
-                  Active Students
+                  Active Users
                 </option>
 
               </select>
@@ -125,14 +189,10 @@ export default function SendMessageModal({
 
           )}
 
-          {/* Templates */}
-
           <div>
 
             <label className="mb-2 block text-sm font-medium">
-
-              Message Template
-
+              Template
             </label>
 
             <select
@@ -144,6 +204,7 @@ export default function SendMessageModal({
               }
               className="w-full rounded-lg border p-3"
             >
+
               <option value="">
                 Custom Message
               </option>
@@ -163,35 +224,29 @@ export default function SendMessageModal({
 
           </div>
 
-          {/* Title */}
-
           <div>
 
             <label className="mb-2 block text-sm font-medium">
-
               Title
-
             </label>
 
             <input
               value={title}
               onChange={(e) =>
-                setTitle(e.target.value)
+                setTitle(
+                  e.target.value
+                )
               }
-              className="w-full rounded-lg border p-3"
               placeholder="Enter message title"
+              className="w-full rounded-lg border p-3"
             />
 
           </div>
 
-          {/* Message */}
-
           <div>
 
             <label className="mb-2 block text-sm font-medium">
-
               Message
-
             </label>
 
             <textarea
@@ -202,35 +257,29 @@ export default function SendMessageModal({
                   e.target.value
                 )
               }
-              className="w-full rounded-lg border p-3"
               placeholder="Type your message..."
+              className="w-full rounded-lg border p-3"
             />
 
           </div>
 
           {/* Preview */}
 
-          <div className="rounded-lg border bg-slate-50 p-4">
+          <div className="rounded-lg border bg-slate-50 p-5">
 
-            <h3 className="mb-3 font-semibold">
-
+            <h3 className="mb-4 font-semibold">
               Telegram Preview
-
             </h3>
 
-            <div className="rounded-lg bg-white p-4 shadow-sm">
+            <div className="rounded-lg bg-white p-4 shadow">
 
-              <strong>
-
+              <h4 className="font-bold text-lg">
                 {title || "Message Title"}
+              </h4>
 
-              </strong>
-
-              <p className="mt-3 whitespace-pre-wrap">
-
+              <p className="mt-4 whitespace-pre-wrap text-slate-700">
                 {message ||
-                  "Your message preview appears here."}
-
+                  "Your message preview will appear here."}
               </p>
 
             </div>
@@ -243,37 +292,37 @@ export default function SendMessageModal({
 
         <div className="flex items-center justify-between border-t px-6 py-5">
 
-            <div className="text-sm text-slate-500">
+          <div className="text-sm text-slate-500">
 
-                {user
-                ? `Recipient: ${user.full_name}`
-                : `Recipient Group: ${recipientType}`}
+            {user
+              ? `Recipient: ${user.full_name}`
+              : `Recipient Group: ${recipientType}`}
 
-            </div>
+          </div>
 
-            <div className="flex gap-3">
+          <div className="flex gap-3">
 
-                <button
-                onClick={onClose}
-                disabled={sending}
-                className="rounded-lg border px-5 py-2 hover:bg-slate-50 disabled:opacity-50"
-                >
-                Cancel
-                </button>
+            <button
+              onClick={onClose}
+              disabled={sending}
+              className="rounded-lg border px-5 py-2 hover:bg-slate-100 disabled:opacity-50"
+            >
+              Cancel
+            </button>
 
-                <button
-                onClick={handleSend}
-                disabled={sending}
-                className="rounded-lg bg-blue-600 px-6 py-2 font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400"
-                >
-                {sending
-                    ? "Sending..."
-                    : user
-                    ? "Send Message"
-                    : "Send Broadcast"}
-                </button>
+            <button
+              onClick={handleSend}
+              disabled={sending}
+              className="rounded-lg bg-blue-600 px-6 py-2 font-medium text-white hover:bg-blue-700 disabled:bg-gray-400"
+            >
+              {sending
+                ? "Sending..."
+                : user
+                ? "Send Message"
+                : "Send Broadcast"}
+            </button>
 
-            </div>
+          </div>
 
         </div>
 
@@ -281,51 +330,4 @@ export default function SendMessageModal({
 
     </div>
   );
-}
-
-async function handleSend() {
-  if (!title.trim()) {
-    alert("Please enter a message title.");
-    return;
-  }
-
-  if (!message.trim()) {
-    alert("Please enter a message.");
-    return;
-  }
-
-  try {
-    setSending(true);
-
-    if (user) {
-      await sendMessage({
-        userId: user.id,
-        title,
-        message,
-      });
-
-      alert("Message sent successfully.");
-    } else {
-      await sendBroadcast({
-        title,
-        message,
-        recipientType,
-      });
-
-      alert("Broadcast completed.");
-    }
-
-    refresh?.();
-
-    onClose?.();
-  } catch (error) {
-    console.error(error);
-
-    alert(
-      error?.response?.data?.message ||
-        "Unable to send message."
-    );
-  } finally {
-    setSending(false);
-  }
 }
