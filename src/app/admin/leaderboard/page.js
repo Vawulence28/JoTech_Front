@@ -15,7 +15,9 @@ export default function AdminLeaderboardPage() {
     try {
       setLoading(true);
       const res = await adminApi.getLeaderboard();
-      setLeaders(res.data || []);
+      setLeaders(
+        Array.isArray(res.data) ? res.data : []
+      );
     } catch (err) {
       console.error("Leaderboard error", err);
     } finally {

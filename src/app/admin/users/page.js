@@ -30,7 +30,9 @@ export default function AdminUsersPage() {
 
           : await adminApi.searchUsers(search);
 
-      setUsers(response.data.data);
+      setUsers(Array.isArray(response.data) ? response.data : []);
+
+      console.log(response);
 
     } catch (error) {
 
