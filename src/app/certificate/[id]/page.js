@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
 
+const API_URL =
+  "https://jo-tech-b7lk.onrender.com/api";
+
 export default function CertificatePage() {
 
   const { id } = useParams();
@@ -23,39 +26,61 @@ export default function CertificatePage() {
 
   useEffect(() => {
 
+    if (!id) return;
+
     const fetchCertificate =
       async () => {
 
         try {
 
-          const token = localStorage.getItem("token");
+          const token =
+            localStorage.getItem("token");
 
           const response =
             await axios.get(
-              `https://jo-tech-b7lk.onrender.com/api/certificates/id/${id}`,
+
+              `${API_URL}/certificates/id/${id}`,
+
               {
+
                 headers: {
-                  Authorization: `Bearer ${token}`,
-                },
+
+                  Authorization:
+                    `Bearer ${token}`
+
+                }
+
               }
+
             );
 
           setCertificate(
             response.data.data
           );
 
-        } catch (err) {
+        }
+
+        catch (err) {
 
           console.error(
+
             "Certificate Fetch Error:",
+
             err
+
           );
 
           setError(
+
+            err.response?.data?.message ||
+
             "Failed to load certificate."
+
           );
 
-        } finally {
+        }
+
+        finally {
 
           setLoading(false);
 
@@ -63,9 +88,7 @@ export default function CertificatePage() {
 
       };
 
-    if (id) {
-      fetchCertificate();
-    }
+    fetchCertificate();
 
   }, [id]);
 
@@ -74,72 +97,30 @@ export default function CertificatePage() {
   // =====================================
 
   const handleDownload =
-    async () => {
+    () => {
 
-      try {
+      if (!certificate) return;
 
-        const token =
-          localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token");
 
-        const response =
-          await axios.get(
-            `https://jo-tech-b7lk.onrender.com/api/certificates/download/${certificate.id}`,
-            {
-              responseType: "blob",
-              headers: {
-                Authorization:
-                  `Bearer ${token}`
-              }
-            }
-          );
-
-        const blob =
-          new Blob(
-            [response.data],
-            {
-              type:
-                "application/pdf"
-            }
-          );
-
-        const downloadUrl =
-          window.URL.createObjectURL(
-            blob
-          );
-
-        const link =
-          document.createElement("a");
-
-        link.href =
-          downloadUrl;
-
-        link.download =
-          `${certificate.user_name.replace(/\s+/g, "_")}_Certificate.pdf`;
-
-        document.body.appendChild(
-          link
-        );
-
-        link.click();
-
-        link.remove();
-
-        window.URL.revokeObjectURL(
-          downloadUrl
-        );
-
-      } catch (err) {
-
-        console.error(
-          "Download Error:",
-          err
-        );
+      if (!token) {
 
         alert(
-          "Unable to download certificate."
+          "Please login again."
         );
 
+        return;
+
       }
+
+      window.open(
+
+        `${API_URL}/certificates/download/${certificate.id}?token=${encodeURIComponent(token)}`,
+
+        "_blank"
+
+      );
 
     };
 
@@ -150,43 +131,60 @@ export default function CertificatePage() {
   const handleShare =
     async () => {
 
+      if (!certificate) return;
+
       const shareUrl =
         `${window.location.origin}/certificate/share/${certificate.share_token}`;
 
       try {
 
-        if (navigator.share) {
+        if (
+
+          navigator.share
+
+        ) {
 
           await navigator.share({
 
             title:
-              "My Jo-Tech Certificate",
+              "My JO TECH Certificate",
 
             text:
-              "View my certificate of completion.",
+              "View my JO TECH certificate of completion.",
 
             url:
               shareUrl
 
           });
 
-        } else {
+        }
+
+        else {
 
           await navigator.clipboard.writeText(
+
             shareUrl
+
           );
 
           alert(
+
             "Certificate link copied to clipboard."
+
           );
 
         }
 
-      } catch (err) {
+      }
+
+      catch (error) {
 
         console.error(
+
           "Share Error:",
-          err
+
+          error
+
         );
 
       }
@@ -194,7 +192,7 @@ export default function CertificatePage() {
     };
 
   // =====================================
-  // LOADING STATE
+  // LOADING
   // =====================================
 
   if (loading) {
@@ -203,9 +201,17 @@ export default function CertificatePage() {
 
       <div className="min-h-screen flex items-center justify-center bg-white">
 
-        <p className="text-lg font-medium text-blue-900">
-          Loading Certificate...
-        </p>
+        <div className="text-center">
+
+          <div className="w-16 h-16 mx-auto rounded-full border-4 border-blue-900 border-t-transparent animate-spin"></div>
+
+          <p className="mt-6 text-lg font-medium text-blue-900">
+
+            Loading Certificate...
+
+          </p>
+
+        </div>
 
       </div>
 
@@ -214,32 +220,49 @@ export default function CertificatePage() {
   }
 
   // =====================================
-  // ERROR STATE
+  // ERROR
   // =====================================
 
-  if (error || !certificate) {
+  if (
+
+    error ||
+
+    !certificate
+
+  ) {
 
     return (
 
-      <div className="min-h-screen flex items-center justify-center bg-white px-6">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
 
-        <div className="max-w-lg text-center">
+        <div className="max-w-lg rounded-3xl bg-white shadow-xl border border-orange-100 p-10 text-center">
 
-          <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-6">
+          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-orange-100">
 
-            <span className="text-3xl">
+            <span className="text-5xl">
+
               ⚠️
+
             </span>
 
           </div>
 
-          <h1 className="text-4xl font-bold text-blue-900">
+          <h1 className="mt-8 text-4xl font-bold text-blue-900">
+
             Certificate Not Found
+
           </h1>
 
-          <p className="mt-4 text-gray-600">
-            {error ||
-              "The requested certificate could not be found."}
+          <p className="mt-4 text-lg text-gray-600">
+
+            {
+
+              error ||
+
+              "The requested certificate could not be found."
+
+            }
+
           </p>
 
         </div>
@@ -256,82 +279,97 @@ export default function CertificatePage() {
 
   return (
 
-    <div className="min-h-screen bg-gray-50 px-6 py-12">
+    <div className="min-h-screen bg-gray-100 py-12 px-6">
 
-      <div className="max-w-6xl mx-auto">
+      <div className="mx-auto max-w-7xl">
 
         {/* PAGE HEADER */}
 
-        <div className="text-center mb-10">
+        <div className="mb-10 text-center">
 
-          <span className="inline-block bg-orange-100 text-orange-600 px-4 py-2 rounded-full font-medium mb-4">
-            JoTech Achievement
+          <span className="inline-flex rounded-full bg-orange-100 px-5 py-2 text-sm font-semibold text-orange-600">
+
+            JO TECH Achievement
+
           </span>
 
-          <h1 className="text-4xl font-bold text-blue-900">
+          <h1 className="mt-5 text-5xl font-extrabold text-blue-900">
+
             Digital Certificate
+
           </h1>
 
-          <p className="text-gray-600 mt-3">
-            Verify, download and share your achievement.
+          <p className="mt-4 text-lg text-gray-600">
+
+            Verify, download and share your certificate of completion.
+
           </p>
 
         </div>
 
-        {/* CERTIFICATE */}
+        {/* CERTIFICATE STARTS BELOW */}
+        <div className="overflow-x-auto py-8">
 
-        <div className="w-full overflow-x-auto py-8">
-
-          <div className="mx-auto w-[1188px] h-[840px] relative overflow-hidden rounded-2xl bg-[#fcfaf5] shadow-2xl border-[10px] border-blue-900">
+          <div className="mx-auto w-[1188px] h-[840px] relative overflow-hidden rounded-3xl bg-[#fcfaf5] border-[10px] border-blue-900 shadow-2xl">
 
             {/* INNER BORDER */}
 
-            <div className="absolute inset-4 border-[4px] border-orange-400 rounded-xl"></div>
+            <div className="absolute inset-5 rounded-2xl border-[4px] border-orange-400"></div>
 
             {/* WATERMARK */}
 
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
 
-              <span className="text-[260px] font-black text-blue-100 opacity-10 select-none">
+              <span className="select-none text-[260px] font-black text-blue-100 opacity-10">
+
                 JO
+
               </span>
 
             </div>
 
             {/* CORNER DECORATIONS */}
 
-            <div className="absolute top-6 left-6 w-16 h-16 border-l-4 border-t-4 border-orange-400"></div>
+            <div className="absolute top-6 left-6 h-16 w-16 border-l-4 border-t-4 border-orange-400"></div>
 
-            <div className="absolute top-6 right-6 w-16 h-16 border-r-4 border-t-4 border-orange-400"></div>
+            <div className="absolute top-6 right-6 h-16 w-16 border-r-4 border-t-4 border-orange-400"></div>
 
-            <div className="absolute bottom-6 left-6 w-16 h-16 border-l-4 border-b-4 border-orange-400"></div>
+            <div className="absolute bottom-6 left-6 h-16 w-16 border-l-4 border-b-4 border-orange-400"></div>
 
-            <div className="absolute bottom-6 right-6 w-16 h-16 border-r-4 border-b-4 border-orange-400"></div>
+            <div className="absolute bottom-6 right-6 h-16 w-16 border-r-4 border-b-4 border-orange-400"></div>
 
-            <div className="relative flex flex-col justify-between h-full px-20 py-16">
+            <div className="relative flex h-full flex-col justify-between px-20 py-16">
 
               {/* HEADER */}
 
               <div className="text-center">
 
-                <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-orange-100 border-4 border-orange-400 shadow-lg">
+                <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full border-4 border-orange-400 bg-orange-100 shadow-lg">
 
                   <span className="text-5xl">
+
                     🏆
+
                   </span>
 
                 </div>
 
-                <p className="mt-5 uppercase tracking-[0.6em] text-blue-700 font-semibold">
-                  JO-TECH
+                <p className="mt-6 uppercase tracking-[0.6em] font-semibold text-blue-700">
+
+                  JO TECH
+
                 </p>
 
-                <h1 className="mt-3 text-6xl font-black tracking-wide text-blue-900">
-                  CERTIFICATE
-                </h1>
+                <h2 className="mt-4 text-6xl font-black tracking-wide text-blue-900">
 
-                <p className="text-2xl font-semibold text-orange-600">
+                  CERTIFICATE
+
+                </h2>
+
+                <p className="mt-2 text-2xl font-bold text-orange-500">
+
                   OF COMPLETION
+
                 </p>
 
               </div>
@@ -341,83 +379,113 @@ export default function CertificatePage() {
               <div className="text-center">
 
                 <p className="text-2xl text-gray-700">
-                  This certificate is proudly awarded to
+
+                  This certificate is proudly presented to
+
                 </p>
 
-                <h2 className="mt-8 text-6xl font-bold text-blue-900">
-                  {certificate.user_name}
-                </h2>
+                <h1 className="mt-8 text-6xl font-black text-blue-900">
 
-                <div className="w-52 h-1 rounded-full bg-orange-500 mx-auto my-8"></div>
+                  {certificate.user_name}
+
+                </h1>
+
+                <div className="mx-auto my-8 h-1 w-56 rounded-full bg-orange-500"></div>
 
                 <p className="text-2xl text-gray-700">
-                  for successfully completing the course on
+
+                  for successfully completing
+
                 </p>
 
                 <h3 className="mt-6 text-4xl font-bold text-orange-600">
+
                   {certificate.course_name}
+
                 </h3>
+
+                <p className="mt-8 max-w-3xl mx-auto text-lg leading-8 text-gray-600">
+
+                  This certificate confirms that the learner has successfully completed all learning objectives, practical activities and assessments required for the programme and has demonstrated the knowledge and skills expected by JO TECH.
+
+                </p>
 
               </div>
 
               {/* FOOTER */}
 
-              <div className="grid grid-cols-3 gap-8 items-end">
+              <div className="grid grid-cols-3 items-end gap-10">
 
                 {/* ISSUE DATE */}
 
                 <div>
 
                   <p className="text-lg text-gray-500">
-                    Issued on
+
+                    Issued On
+
                   </p>
 
-                  <p className="mt-2 text-2xl font-semibold text-blue-900">
+                  <p className="mt-2 text-2xl font-bold text-blue-900">
+
                     {new Date(
+
                       certificate.issued_at
+
                     ).toDateString()}
+
                   </p>
 
                 </div>
 
-                {/* CERTIFICATION */}
+                {/* SIGNATURE */}
 
                 <div className="flex flex-col items-center">
 
-                  <div className="w-24 h-24 rounded-full bg-orange-500 flex items-center justify-center shadow-lg text-white text-5xl">
+                  <div className="flex h-24 w-24 items-center justify-center rounded-full bg-orange-500 text-5xl font-bold text-white shadow-xl">
 
                     ✓
 
                   </div>
 
-                  <div className="w-72 mt-6 pt-3 border-t-2 border-gray-400 text-center">
+                  <div className="mt-6 w-72 border-t-2 border-gray-400 pt-3 text-center">
 
-                    <p className="text-lg font-semibold text-blue-900">
-                      JO-Tech Certification Authority
+                    <p className="font-semibold text-blue-900">
+
+                      JO TECH Certification Authority
+
                     </p>
 
                   </div>
 
                 </div>
 
-                {/* CERTIFICATE DETAILS */}
+                {/* DETAILS */}
 
                 <div className="text-right">
 
                   <p className="text-lg text-gray-500">
+
                     Certificate Number
+
                   </p>
 
-                  <p className="mt-2 text-xl font-bold text-blue-900">
+                  <p className="mt-2 text-xl font-bold text-blue-900 break-all">
+
                     {certificate.certificate_number}
+
                   </p>
 
                   <p className="mt-6 text-lg text-gray-500">
+
                     Verification Code
+
                   </p>
 
                   <p className="mt-2 text-xl font-bold tracking-[0.25em] text-orange-600">
+
                     {certificate.verification_code}
+
                   </p>
 
                 </div>
@@ -430,22 +498,19 @@ export default function CertificatePage() {
 
         </div>
 
-        {/* =====================================
-            ACTION BUTTONS
-        ====================================== */}
-
-        <div className="flex flex-wrap justify-center gap-4 mt-10">
+        {/* ACTION BUTTONS */}
+        <div className="mt-12 flex flex-wrap justify-center gap-5">
 
           <button
             onClick={handleDownload}
-            className="bg-blue-900 hover:bg-blue-800 text-white px-8 py-3 rounded-xl font-semibold transition duration-200"
+            className="rounded-xl bg-blue-900 px-8 py-3 font-semibold text-white transition hover:bg-blue-800"
           >
             Download PDF
           </button>
 
           <button
             onClick={handleShare}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-xl font-semibold transition duration-200"
+            className="rounded-xl bg-orange-500 px-8 py-3 font-semibold text-white transition hover:bg-orange-600"
           >
             Share Certificate
           </button>
@@ -453,62 +518,108 @@ export default function CertificatePage() {
         </div>
 
         {/* =====================================
-            VERIFICATION CARD
+            VERIFICATION
         ====================================== */}
 
-        <div className="bg-white border border-blue-100 rounded-3xl shadow-sm p-8 mt-12">
+        <div className="mt-14 rounded-3xl border border-blue-100 bg-white p-8 shadow-sm">
 
           <h3 className="text-2xl font-bold text-blue-900">
+
             Certificate Verification
+
           </h3>
 
           <p className="mt-2 text-gray-600">
-            Verify the authenticity of this certificate using the details below.
+
+            Use the information below to verify the authenticity of this certificate.
+
           </p>
 
-          <div className="grid md:grid-cols-3 gap-6 mt-8">
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
 
             {/* CERTIFICATE ID */}
 
-            <div className="bg-blue-50 rounded-xl p-5">
+            <div className="rounded-xl bg-blue-50 p-5">
 
-              <p className="text-sm text-blue-600 mb-2">
+              <p className="mb-2 text-sm text-blue-600">
+
                 Certificate ID
+
               </p>
 
-              <p className="font-semibold text-blue-900 break-all">
+              <p className="break-all font-semibold text-blue-900">
+
                 {certificate.id}
+
               </p>
 
             </div>
 
             {/* SHARE TOKEN */}
 
-            <div className="bg-orange-50 rounded-xl p-5">
+            <div className="rounded-xl bg-orange-50 p-5">
 
-              <p className="text-sm text-orange-600 mb-2">
-                Verification Token
+              <p className="mb-2 text-sm text-orange-600">
+
+                Share Token
+
               </p>
 
-              <p className="font-semibold text-orange-700 break-all">
+              <p className="break-all font-semibold text-orange-700">
+
                 {certificate.share_token}
+
               </p>
 
             </div>
 
             {/* ISSUE DATE */}
 
-            <div className="bg-blue-50 rounded-xl p-5">
+            <div className="rounded-xl bg-blue-50 p-5">
 
-              <p className="text-sm text-blue-600 mb-2">
+              <p className="mb-2 text-sm text-blue-600">
+
                 Issue Date
+
               </p>
 
               <p className="font-semibold text-blue-900">
+
                 {new Date(
                   certificate.issued_at
                 ).toDateString()}
+
               </p>
+
+            </div>
+
+          </div>
+
+          <div className="mt-8 rounded-2xl border border-green-200 bg-green-50 p-6">
+
+            <div className="flex items-center gap-3">
+
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-600 text-xl text-white">
+
+                ✓
+
+              </div>
+
+              <div>
+
+                <h4 className="font-bold text-green-700">
+
+                  Verified Certificate
+
+                </h4>
+
+                <p className="mt-1 text-sm text-green-600">
+
+                  This certificate was issued by JO TECH and its verification details are stored securely.
+
+                </p>
+
+              </div>
 
             </div>
 
