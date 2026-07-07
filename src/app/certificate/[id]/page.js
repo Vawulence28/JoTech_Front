@@ -406,7 +406,7 @@ export default function CertificatePage() {
 
                 <p className="mt-8 max-w-3xl mx-auto text-lg leading-8 text-gray-600">
 
-                  This certificate confirms that the learner has successfully completed all learning objectives, practical activities and assessments required for the programme and has demonstrated the knowledge and skills expected by JO TECH.
+                  This certificate confirms that the learner has successfully completed all learning objectives, practical activities and assessments required for the programme by JO TECH.
 
                 </p>
 
