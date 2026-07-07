@@ -28,9 +28,16 @@ export default function CertificatePage() {
 
         try {
 
+          const token = localStorage.getItem("token");
+
           const response =
             await axios.get(
-              `https://jo-tech-b7lk.onrender.com/api/certificates/id/${id}`
+              `https://jo-tech-b7lk.onrender.com/api/certificates/id/${id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
             );
 
           setCertificate(
