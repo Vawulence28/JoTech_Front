@@ -54,6 +54,15 @@ export default function AdminTelegramPage() {
   const [showMessageModal, setShowMessageModal] =
     useState(false);
 
+  const [broadcastTitle, setBroadcastTitle] = 
+    useState("");
+
+  const [broadcastMessage, setBroadcastMessage] = 
+    useState("");
+
+  const [sendingBroadcast, setSendingBroadcast] = 
+    useState(false);
+
   // =====================================================
   // LOAD DASHBOARD
   // =====================================================
@@ -216,7 +225,53 @@ export default function AdminTelegramPage() {
 
   }, [refresh]);
 
-    // =====================================================
+  const sendBroadcast = async () => {
+    if (!broadcastTitle.trim() || !broadcastMessage.trim()) {
+      return alert("Please enter both title and message.");
+    }
+
+    if (
+      !confirm(
+        "Send this message to every learner connected to Telegram?"
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setSendingBroadcast(true);
+
+      await fetch(
+        "https://jo-tech-b7lk.onrender.com/api/admin/telegram/broadcast",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            recipientType: "telegram",
+            title: broadcastTitle,
+            message: broadcastMessage,
+          }),
+        }
+      );
+
+      alert("Broadcast sent successfully.");
+
+      setBroadcastTitle("");
+      setBroadcastMessage("");
+
+      await refresh();
+    } catch (error) {
+      console.error(error);
+
+      alert("Unable to send broadcast.");
+    } finally {
+      setSendingBroadcast(false);
+    }
+  };
+  // =====================================================
   // COMPUTED VALUES
   // =====================================================
 
@@ -395,6 +450,65 @@ export default function AdminTelegramPage() {
       icon="📈"
       color="emerald"
     />
+
+  </section>
+
+  {/* =====================================================
+      BROADCAST ANNOUNCEMENTS
+  ===================================================== */}
+
+  <section className="rounded-2xl border bg-white p-8 shadow-sm">
+
+    <div className="mb-8">
+
+      <h2 className="text-2xl font-bold">
+        Broadcast Announcement
+      </h2>
+
+      <p className="mt-2 text-slate-500">
+        Send a Telegram announcement to every learner who
+        has linked their Telegram account.
+      </p>
+
+    </div>
+
+    <div className="space-y-5">
+
+      <input
+        type="text"
+        placeholder="Announcement title"
+        value={broadcastTitle}
+        onChange={(e) =>
+          setBroadcastTitle(e.target.value)
+        }
+        className="w-full rounded-xl border border-slate-300 px-4 py-3"
+      />
+
+      <textarea
+        rows={6}
+        placeholder="Write your announcement..."
+        value={broadcastMessage}
+        onChange={(e) =>
+          setBroadcastMessage(e.target.value)
+        }
+        className="w-full rounded-xl border border-slate-300 px-4 py-3"
+      />
+
+      <div className="flex justify-end">
+
+        <button
+          onClick={sendBroadcast}
+          disabled={sendingBroadcast}
+          className="rounded-xl bg-purple-600 px-6 py-3 font-semibold text-white hover:bg-purple-700 disabled:opacity-50"
+        >
+          {sendingBroadcast
+            ? "Sending..."
+            : "📢 Send Broadcast"}
+        </button>
+
+      </div>
+
+    </div>
 
   </section>
 
