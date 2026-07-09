@@ -242,7 +242,7 @@ export default function AdminTelegramPage() {
       setSendingBroadcast(true);
 
       await fetch(
-        "https://jo-tech-b7lk.onrender.com/api/admin/telegram/broadcast",
+        "https://jo-tech-b7lk.onrender.com/api/admin/messages/broadcast",
         {
           method: "POST",
           headers: {
