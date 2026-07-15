@@ -9,6 +9,8 @@ import PWARegister from "@/components/pwa/PWARegister";
 import InstallPrompt from "@/components/pwa/InstallPrompt";
 import OfflineBanner from "@/components/pwa/OfflineBanner";
 
+import CapacitorInitializer from "@/components/CapacitorInitializer";
+
 export const metadata = {
   metadataBase: new URL("https://jo-tech-hub.vercel.app"),
 
@@ -87,11 +89,8 @@ export const metadata = {
     images: [
       {
         url: "/og-image.png",
-
         width: 1200,
-
         height: 630,
-
         alt: "JO-Tech Learn",
       },
     ],
@@ -105,9 +104,7 @@ export const metadata = {
     description:
       "AI-powered personalized learning platform with smart roadmaps, streak tracking, progress analytics and certificates.",
 
-    images: [
-      "/og-image.png",
-    ],
+    images: ["/og-image.png"],
   },
 
   icons: {
@@ -159,44 +156,36 @@ export const viewport = {
   themeColor: "#1E3A8A",
 };
 
-export default function RootLayout({
-  children,
-}) {
+export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-
-      <body className="bg-white text-black">
+    <html lang="en" suppressHydrationWarning>
+      <body className="bg-white text-black antialiased">
 
         <AuthProvider>
 
-          {/* Register Service Worker */}
+          {/* Initialize Capacitor Native Features */}
+          <CapacitorInitializer />
 
+          {/* Register Service Worker */}
           <PWARegister />
 
           {/* Offline Banner */}
-
           <OfflineBanner />
 
-          {/* Install App Prompt */}
-
+          {/* Install PWA Prompt */}
           <InstallPrompt />
 
-          <div className="min-h-screen flex flex-col">
+          <div className="flex min-h-screen flex-col">
 
             {/* Global Navigation */}
-
             <Navbar />
 
             {/* Main Content */}
-
             <main className="flex-1">
-
               {children}
-
             </main>
 
             {/* Global Footer */}
-
             <Footer />
 
           </div>
@@ -204,7 +193,6 @@ export default function RootLayout({
         </AuthProvider>
 
       </body>
-
     </html>
   );
 }

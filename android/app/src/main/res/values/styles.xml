@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Main application theme -->
+    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
+
+        <item name="android:windowLightStatusBar">false</item>
+
+    </style>
+
+    <!-- Capacitor Theme -->
+    <style name="AppTheme.NoActionBar"
+        parent="Theme.Material3.DayNight.NoActionBar">
+
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+    </style>
+
+    <!-- Splash Theme -->
+    <style
+        name="AppTheme.NoActionBarLaunch"
+        parent="Theme.SplashScreen">
+
+        <item name="windowSplashScreenBackground">@color/colorPrimaryDark</item>
+
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash</item>
+
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+
+    </style>
+
+</resources>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Primary Brand Color -->
+    <color name="colorPrimary">#2563EB</color>
+
+    <!-- Dark Variant -->
+    <color name="colorPrimaryDark">#0D1117</color>
+
+    <!-- Accent -->
+    <color name="colorAccent">#3B82F6</color>
+
+    <!-- Background -->
+    <color name="colorBackground">#FFFFFF</color>
+
+    <!-- Surface -->
+    <color name="colorSurface">#FFFFFF</color>
+
+    <!-- Text -->
+    <color name="colorOnPrimary">#FFFFFF</color>
+
+</resources>

@@ -1,0 +1,31 @@
+{
+  "appId": "com.jotech.learning",
+  "appName": "JoTech Learning",
+  "webDir": "public",
+
+  "server": {
+    "url": "https://jo-tech-hub.vercel.app",
+    "cleartext": false,
+    "androidScheme": "https"
+  },
+
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false,
+      "launchShowDuration": 1500,
+      "backgroundColor": "#0D1117",
+      "showSpinner": false,
+      "androidSplashResourceName": "splash"
+    },
+
+    "StatusBar": {
+      "style": "LIGHT",
+      "backgroundColor": "#0D1117",
+      "overlaysWebView": false
+    },
+
+    "Keyboard": {
+      "resize": "body"
+    }
+  }
+}

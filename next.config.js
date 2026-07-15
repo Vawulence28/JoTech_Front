@@ -1,19 +1,5 @@
-import withSerwistInit from "@serwist/next";
-
-/**
- * Initialize the Serwist plugin.
- */
-const withSerwist = withSerwistInit({
-  swSrc: "src/sw.js",
-  swDest: "public/sw.js",
-});
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  allowedDevOrigins: [
-    "192.168.56.144",
-  ],
-
   reactStrictMode: true,
 
   poweredByHeader: false,
@@ -24,9 +10,11 @@ const nextConfig = {
     formats: ["image/avif", "image/webp"],
   },
 
-  experimental: {},
+  allowedDevOrigins: [
+    "192.168.56.144",
+  ],
 
   turbopack: {},
 };
 
-export default withSerwist(nextConfig);
+export default nextConfig;
