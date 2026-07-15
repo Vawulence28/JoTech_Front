@@ -1,23 +1,20 @@
 import { Capacitor } from "@capacitor/core";
 
-import { App } from "@capacitor/app";
+let initialized = false;
 
-export function initializeBackButton() {
+export async function initializeBackButton() {
+  if (!Capacitor.isNativePlatform()) return;
 
-    if (!Capacitor.isNativePlatform()) return;
+  if (initialized) return;
+  initialized = true;
 
-    App.addListener("backButton", () => {
+  const { App } = await import("@capacitor/app");
 
-        if (window.history.length > 1) {
-
-            window.history.back();
-
-        } else {
-
-            App.exitApp();
-
-        }
-
-    });
-
+  App.addListener("backButton", () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      App.exitApp();
+    }
+  });
 }
